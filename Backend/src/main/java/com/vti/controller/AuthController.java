@@ -55,8 +55,6 @@ public class AuthController {
         }
 
         final CustomUserDetails userDetails = jwtUserDetailsService.loadUserByUsername(request.getPhoneNumber());
-        System.out.println(userDetails.getUserId());
-        System.out.println(userDetails.getFullName());
         final String jwtToken = tokenManager.generateToken(userDetails);
         return ResponseEntity.ok(Map.of(
                 "token", jwtToken,
@@ -70,6 +68,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> addUser(@Valid @RequestBody CreateUserForm createUserForm) {
         User user = userService.createUser(createUserForm);
-        return user != null ? ResponseEntity.status(200).body("Create user success") : ResponseEntity.notFound().build();
+        return user != null ? ResponseEntity.status(200).body("Register success") : ResponseEntity.notFound().build();
     }
 }
