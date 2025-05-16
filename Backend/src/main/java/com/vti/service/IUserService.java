@@ -13,5 +13,7 @@ public interface IUserService {
 
     User findUserByPhoneNumber(String phoneNumber);
 
+    User findUserByEmail(String email);
+
 //    User updateUser(User user);
 }

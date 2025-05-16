@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity(name = "password_reset_token")
 @Data
 public class PasswordResetToken {
-
+    public static final int EXPIRATION = 60 * 24;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer id;
