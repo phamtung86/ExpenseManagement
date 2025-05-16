@@ -20,9 +20,8 @@ public class UserService implements IUserService{
 
     @Override
     public User createUser(CreateUserForm createUserForm) {
-        User user = modelMapper.map(createUserForm, User.class);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+
+        return null;
     }
 
     @Override
