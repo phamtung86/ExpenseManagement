@@ -16,10 +16,8 @@ public class UserEmailNotExistsValidator implements ConstraintValidator<UserEmai
 	public boolean isValid(String email, ConstraintValidatorContext constraintValidatorContext) {
 
 		if (StringUtils.isEmpty(email)) {
-			return true;
+			return false;
 		}
-		return true;
-
-		//return !service.isAccountExistsByEmail(email);
+		return !service.isUserExistsByEmail(email);
 	}
 }

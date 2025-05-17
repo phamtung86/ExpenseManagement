@@ -11,6 +11,8 @@ public interface IUserService {
 
     boolean isUserExistsByPhoneNumber(String phoneNumber);
 
+    boolean isUserExistsByEmail(String email);
+
     User findUserByPhoneNumber(String phoneNumber);
 
     User findUserByEmail(String email);

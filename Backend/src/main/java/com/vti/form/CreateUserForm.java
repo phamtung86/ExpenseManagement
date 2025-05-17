@@ -1,6 +1,6 @@
 package com.vti.form;
 
-import com.vti.validation.user.UserPhoneNumberExists;
+import com.vti.validation.user.UserEmailNotExists;
 import com.vti.validation.user.UserPhoneNumberNotExists;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -16,8 +16,10 @@ public class CreateUserForm {
     private String fullName;
 
     @Email
+    @UserEmailNotExists
     @NotBlank(message = "{User.createUser.form.email.NotBlank}")
     private String email;
+
     @NotBlank(message = "{User.createUser.form.phoneNumber.NotBlank}")
     @UserPhoneNumberNotExists
     private String phoneNumber;
