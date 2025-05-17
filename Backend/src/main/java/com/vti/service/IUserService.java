@@ -5,7 +5,7 @@ import com.vti.form.CreateUserForm;
 
 public interface IUserService {
 
-    User createUser(CreateUserForm createUserForm);
+    String  createUser(CreateUserForm createUserForm);
 
     boolean isUserExistsByID(Integer id);
 

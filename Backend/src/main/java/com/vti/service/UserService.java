@@ -2,11 +2,16 @@ package com.vti.service;
 
 import com.vti.entity.User;
 import com.vti.form.CreateUserForm;
+import com.vti.jwtutils.CustomUserDetails;
+import com.vti.jwtutils.TokenManager;
 import com.vti.repository.IUserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 @Service
 public class UserService implements IUserService{
@@ -17,12 +22,31 @@ public class UserService implements IUserService{
     private ModelMapper modelMapper;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    TokenManager tokenManager;
 
     @Override
-    public User createUser(CreateUserForm createUserForm) {
+    public String  createUser(CreateUserForm createUserForm) {
+        if ((userRepository.findByEmail(createUserForm.getEmail())) != null) {
+            throw new RuntimeException("Email đã tồn tại!");
+        }
 
-        return null;
-    }
+        User user = new User();
+        user.setFullName(createUserForm.getFullName());
+        user.setPassword(passwordEncoder.encode(createUserForm.getPassword()));
+        user.setEmail(createUserForm.getEmail());
+
+        User userNew = userRepository.save(user);
+
+        CustomUserDetails userDetails = new CustomUserDetails(
+                user.getFullName(),
+                user.getPassword(),
+                new ArrayList<>(),
+                user.getId(),
+                user.getFullName()
+        );
+            return tokenManager.generateToken(userDetails);
+        }
 
     @Override
     public boolean isUserExistsByID(Integer id) {

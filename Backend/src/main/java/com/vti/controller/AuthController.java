@@ -88,10 +88,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> addUser(@Valid @RequestBody CreateUserForm createUserForm) {
-        User user = userService.createUser(createUserForm);
-        return user != null ? ResponseEntity.status(200).body("Register success") : ResponseEntity.notFound().build();
+    public ResponseEntity<?> register(@RequestBody CreateUserForm createUserForm) {
+        try {
+            String token = userService.createUser(createUserForm);
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
+
 
     @PostMapping("/forgot-password")
     public GenericResponse resetPassword(HttpServletRequest request, @RequestParam("email") String userEmail) throws AccessException {

@@ -24,4 +24,5 @@ public class CustomUserDetails extends User {
         this.userId = userId;
         this.fullName = fullName;
     }
+
 }

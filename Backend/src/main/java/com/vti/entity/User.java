@@ -2,6 +2,7 @@ package com.vti.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.List;
 @Entity(name = "user")
 @Data
 @NoArgsConstructor
+@Getter
 public class User {
 
     @Id
