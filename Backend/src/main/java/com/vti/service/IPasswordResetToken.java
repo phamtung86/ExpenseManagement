@@ -7,4 +7,6 @@ public interface IPasswordResetToken {
     PasswordResetToken findByToken(String token);
 
     void createNewPasswordToken(PasswordResetToken passwordResetToken);
+
+    void removeToken(String token);
 }

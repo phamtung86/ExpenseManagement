@@ -43,4 +43,13 @@ public class UserService implements IUserService{
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    @Override
+    public void updatePassword(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
+
+
 }
