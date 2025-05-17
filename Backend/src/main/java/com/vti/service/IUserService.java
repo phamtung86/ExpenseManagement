@@ -15,5 +15,7 @@ public interface IUserService {
 
     User findUserByEmail(String email);
 
+    void updatePassword(String email, String password);
+
 //    User updateUser(User user);
 }

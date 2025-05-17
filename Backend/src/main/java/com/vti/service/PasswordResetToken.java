@@ -18,4 +18,9 @@ public class PasswordResetToken implements IPasswordResetToken {
     public void createNewPasswordToken(com.vti.entity.PasswordResetToken passwordResetToken) {
         passwordResetTokenRepository.save(passwordResetToken);
     }
+
+    @Override
+    public void removeToken(String token) {
+        passwordResetTokenRepository.removePasswordResetTokensByToken(token);
+    }
 }

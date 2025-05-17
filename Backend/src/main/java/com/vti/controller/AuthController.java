@@ -29,7 +29,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.vti.entity.PasswordResetToken.EXPIRATION;
@@ -121,5 +123,35 @@ public class AuthController {
         String message = messages.getMessage("message.resetPassword", null, "Please check your email to reset password!",
                 request.getLocale());
         return new GenericResponse(message);
+    }
+
+    @PostMapping("/validate-token")
+    public ResponseEntity<?> validateToken(@Valid @RequestParam("token") String token) {
+        PasswordResetToken validateToken = passwordResetToken.findByToken(token);
+        if (Objects.nonNull(validateToken)) {
+            if (new Date().getTime() - validateToken.getCreatedAt().getTime() > EXPIRATION * 60 * 1000) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("Token is expired!!!"));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ErrorResponse("Success"));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("Cant find token!!!"));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestParam("token") String token,
+                                           @Valid @RequestParam("password") String password) {
+        PasswordResetToken validateToken = passwordResetToken.findByToken(token);
+        if (Objects.nonNull(validateToken)) {
+            User user = validateToken.getUser();
+            userService.updatePassword(user.getEmail(), password);
+            passwordResetToken.removeToken(token);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ErrorResponse("Success"));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("Token is expired!!!"));
     }
 }
