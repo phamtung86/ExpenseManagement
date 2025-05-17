@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class UserService implements IUserService{
 
@@ -19,11 +21,12 @@ public class UserService implements IUserService{
     PasswordEncoder passwordEncoder;
 
     @Override
-    public User createUser(CreateUserForm createUserForm) {
-
-        return null;
+    public User  createUser(CreateUserForm createUserForm) {
+        User user = modelMapper.map(createUserForm, User.class);
+        user.setPassword(passwordEncoder.encode(createUserForm.getPassword()));
+        user.setCreatedAt(new Date());
+        return userRepository.save(user);
     }
-
     @Override
     public boolean isUserExistsByID(Integer id) {
         return userRepository.existsById(id);
@@ -32,6 +35,11 @@ public class UserService implements IUserService{
     @Override
     public boolean isUserExistsByPhoneNumber(String phoneNumber) {
         return userRepository.existsByPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public boolean isUserExistsByEmail(String email) {
+        return userRepository.findByEmail(email) != null;
     }
 
     @Override

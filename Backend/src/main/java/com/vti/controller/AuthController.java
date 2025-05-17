@@ -26,6 +26,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
@@ -90,9 +91,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> addUser(@Valid @RequestBody CreateUserForm createUserForm) {
-        User user = userService.createUser(createUserForm);
-        return user != null ? ResponseEntity.status(200).body("Register success") : ResponseEntity.notFound().build();
+    public ResponseEntity<?> register(@Valid @RequestBody CreateUserForm createUserForm) {
+        try {
+            User user = userService.createUser(createUserForm);
+            return user != null
+                    ? ResponseEntity.ok("Register success")
+                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Register failed");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/forgot-password")
@@ -140,6 +147,7 @@ public class AuthController {
                 .body(new ErrorResponse("Cant find token!!!"));
     }
 
+    @Transactional
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestParam("token") String token,
                                            @Valid @RequestParam("password") String password) {
