@@ -2,6 +2,7 @@ package com.vti.service;
 
 import com.vti.entity.User;
 import com.vti.form.CreateUserForm;
+import com.vti.form.ChangePasswordForm;
 
 public interface IUserService {
 
@@ -17,7 +18,9 @@ public interface IUserService {
 
     User findUserByEmail(String email);
 
+    // hàm xử lý đổi mật khẩu khi quên
     void updatePassword(String email, String password);
 
+    boolean changePassword(Integer id, ChangePasswordForm changePasswordForm);
 //    User updateUser(User user);
 }

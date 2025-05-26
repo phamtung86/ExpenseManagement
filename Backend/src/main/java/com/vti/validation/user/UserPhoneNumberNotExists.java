@@ -18,7 +18,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = { UserPhoneNumberNotExistsValidator.class })
 @Repeatable(UserPhoneNumberNotExists.List.class)
 public @interface UserPhoneNumberNotExists {
-	String message() default "phone number exists already!";
+	String message() default "{User.createUser.form.phoneNumber.Existed}";
 
 	Class<?>[] groups() default {};
 

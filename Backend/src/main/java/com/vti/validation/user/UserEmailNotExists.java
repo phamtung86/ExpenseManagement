@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = { UserEmailNotExistsValidator.class })
 @Repeatable(UserEmailNotExists.List.class)
 public @interface UserEmailNotExists {
-	String message() default "Email exists already!";
+	String message() default "{User.createUser.form.Email.Existed}";
 
 	Class<?>[] groups() default {};
 

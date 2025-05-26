@@ -38,7 +38,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-    // Default exception
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAll(Exception exception) {
 
@@ -51,7 +50,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Not found url handler
     protected ResponseEntity<Object> handleNoHandlerFoundException(
             NoHandlerFoundException exception,
             HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -65,8 +63,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorResponse response = new ErrorResponse(message, detailMessage, null, code, moreInformation);
         return new ResponseEntity<>(response, status);
     }
-
-    // Not support HTTP Method
 
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
             HttpRequestMethodNotSupportedException exception,
@@ -90,8 +86,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return message;
     }
 
-    // Not support media type
-
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException exception,
                                                                      HttpHeaders headers, HttpStatus status, WebRequest request) {
 
@@ -112,28 +106,29 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return message.substring(0, message.length() - 2);
     }
 
-    // BindException: This exception is thrown when fatal binding errors occur.
-    // MethodArgumentNotValidException: This exception is thrown when argument
-    // annotated with @Valid failed validation:
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatusCode status,
+                                                                  WebRequest request) {
 
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
-                                                                  HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-        String message = getMessage("MethodArgumentNotValidException.message");
-        String detailMessage = exception.getLocalizedMessage();
-        // error
         Map<String, String> errors = new HashMap<>();
-        for (ObjectError error : exception.getBindingResult().getAllErrors()) {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        }
-        int code = 400;
-        String moreInformation = "http://localhost:8080/api/v1/exception/400";
 
-        ErrorResponse response = new ErrorResponse(message, detailMessage, errors, code, moreInformation);
-        return new ResponseEntity<>(response, status);
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            String field = fieldError.getField();
+            String message = fieldError.getDefaultMessage();
+            errors.put(field, message);
+        }
+
+        for (ObjectError globalError : ex.getBindingResult().getGlobalErrors()) {
+            String objectName = globalError.getObjectName();
+            String message = globalError.getDefaultMessage();
+            errors.put(objectName, message);
+        }
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
 
     // bean validation error
     @SuppressWarnings("rawtypes")
@@ -156,9 +151,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    // MissingServletRequestPartException: This exception is thrown when when the part of a multipart request not found
-    // MissingServletRequestParameterException: This exception is thrown when request missing parameter:
-
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException exception, HttpHeaders headers, HttpStatus status,
             WebRequest request) {
@@ -172,8 +164,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 
-    // TypeMismatchException: This exception is thrown when try to set bean property with wrong type.
-    // MethodArgumentTypeMismatchException: This exception is thrown when method argument is not the expected type:
+
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     public ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException exception) {
 
