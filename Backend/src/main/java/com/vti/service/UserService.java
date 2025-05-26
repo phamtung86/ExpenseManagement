@@ -2,6 +2,7 @@ package com.vti.service;
 
 import com.vti.entity.User;
 import com.vti.form.CreateUserForm;
+import com.vti.form.ChangePasswordForm;
 import com.vti.repository.IUserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class UserService implements IUserService{
@@ -57,6 +59,22 @@ public class UserService implements IUserService{
         User user = userRepository.findByEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
+    }
+
+    @Override
+    public boolean changePassword(Integer id, ChangePasswordForm changePasswordForm) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) return false;
+        User user = optionalUser.get();
+        if(!changePasswordForm.getNewPassword().equals(changePasswordForm.getConfirmPassword())) {
+            return false;
+        }
+        if(!passwordEncoder.matches(changePasswordForm.getNewPassword(), user.getPassword())) {
+            return false;
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordForm.getNewPassword()));
+        userRepository.save(user);
+        return true;
     }
 
 

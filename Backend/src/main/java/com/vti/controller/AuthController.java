@@ -103,10 +103,10 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public GenericResponse resetPassword(HttpServletRequest request, @RequestParam("email") String userEmail) throws AccessException {
+    public ResponseEntity<?> resetPassword(HttpServletRequest request, @RequestParam("email") String userEmail)  {
         User user = userService.findUserByEmail(userEmail);
         if (user == null) {
-            throw new AccessException("No user found with email: " + userEmail);
+            return ResponseEntity.status(400).body("No user found with email: " + userEmail);
         }
 
         // Tạo token mới và thiết lập thời gian hết hạn
@@ -127,9 +127,9 @@ public class AuthController {
         mailSender.send(mail);
 
         // Trả về thông báo thành công
-        String message = messages.getMessage("message.resetPassword", null, "Please check your email to reset password!",
-                request.getLocale());
-        return new GenericResponse(message);
+//        String message = messages.getMessage("message.resetPassword", null, "Please check your email to reset password!",
+//                request.getLocale());
+        return ResponseEntity.status(200).body("Please check your email to reset password!");
     }
 
     @PostMapping("/validate-token")

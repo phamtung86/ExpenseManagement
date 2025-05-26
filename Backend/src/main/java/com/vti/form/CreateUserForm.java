@@ -15,17 +15,18 @@ public class CreateUserForm {
     @NotBlank(message = "{User.createUser.form.fullname.NotBlank}")
     private String fullName;
 
-    @Email
+    @Email(message = "{User.createUser.form.email.Invalid}")
     @UserEmailNotExists
     @NotBlank(message = "{User.createUser.form.email.NotBlank}")
     private String email;
 
-    @NotBlank(message = "{User.createUser.form.phoneNumber.NotBlank}")
     @UserPhoneNumberNotExists
+    @NotBlank(message = "{User.createUser.form.phoneNumber.NotBlank}")
     private String phoneNumber;
 
     @NotBlank(message = "{User.createUser.form.password.NotBlank}")
-    @Length(min=8, max=30, message = "{User.createUser.form.password.LengthRange}")
+    @Length(min = 8, max = 30, message = "{User.createUser.form.password.LengthRange}")
     private String password;
+
 
 }
