@@ -8,4 +8,7 @@ import java.util.List;
 
 public interface ITransactionService {
     public List<TransactionsDTO> filterTransactions(TransactionFilter filter);
+
+    Transactions createTransaction(TransactionsDTO transactionsDTO);
+
 }

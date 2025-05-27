@@ -69,7 +69,7 @@ public class UserService implements IUserService{
         if(!changePasswordForm.getNewPassword().equals(changePasswordForm.getConfirmPassword())) {
             return false;
         }
-        if(!passwordEncoder.matches(changePasswordForm.getNewPassword(), user.getPassword())) {
+        if(!passwordEncoder.matches(changePasswordForm.getOldPassword(), user.getPassword())) {
             return false;
         }
         user.setPassword(passwordEncoder.encode(changePasswordForm.getNewPassword()));
