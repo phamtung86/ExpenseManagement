@@ -1,16 +1,20 @@
 package com.vti.service;
 
+import com.vti.dto.UserDTO;
+import com.vti.dto.UserRequestDTO;
+import com.vti.dto.UserResponseDTO;
 import com.vti.entity.User;
 import com.vti.form.CreateUserForm;
 import com.vti.form.ChangePasswordForm;
 import com.vti.repository.IUserRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService implements IUserService{
@@ -77,5 +81,22 @@ public class UserService implements IUserService{
         return true;
     }
 
+    @Override
+    public UserResponseDTO getUserById(Integer id) {
+        Optional<User> user = userRepository.findById(id);
+        return modelMapper.map(user, UserResponseDTO.class);
+    }
 
+    @Override
+    @Transactional
+    public UserResponseDTO updateUser(Integer id, UserRequestDTO userRequestDTO) {
+        Optional<User> isUser = userRepository.findById(id);
+        if (isUser.isEmpty()) {
+            throw new RuntimeException("User id khong ton tai");
+        }
+        User user = modelMapper.map(userRequestDTO, User.class);
+        user.setId(id);
+        userRepository.save(user);
+        return modelMapper.map(user, UserResponseDTO.class);
+    }
 }

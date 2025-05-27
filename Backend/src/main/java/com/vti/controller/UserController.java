@@ -1,5 +1,8 @@
 package com.vti.controller;
 
+import com.vti.dto.UserDTO;
+import com.vti.dto.UserRequestDTO;
+import com.vti.dto.UserResponseDTO;
 import com.vti.form.ChangePasswordForm;
 import com.vti.service.IUserService;
 import jakarta.validation.Valid;
@@ -24,4 +27,15 @@ public class UserController {
                     : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Change password failed");
     }
 
+    @GetMapping("/get-user-info/{id}")
+    public  ResponseEntity<UserResponseDTO> getUserById(@PathVariable Integer id){
+        UserResponseDTO userResponseDTO = userService.getUserById(id);
+        return ResponseEntity.ok(userResponseDTO);
+    }
+
+    @PutMapping("/update-user-info/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO userRequestDTO){
+        UserResponseDTO userResponseDTO = userService.updateUser(id, userRequestDTO);
+        return ResponseEntity.ok(userResponseDTO);
+    }
 }
