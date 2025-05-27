@@ -1,6 +1,5 @@
 package com.vti.dto;
 
-import com.vti.entity.MoneySources;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionsDTO {
+
     private Integer id;
+
     private Double amount;
 
     private String action;

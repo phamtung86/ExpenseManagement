@@ -22,14 +22,14 @@ public class TokenManager {
     // Generate JWT Token
     public String generateToken(CustomUserDetails customUserDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", customUserDetails.getUsername());
+        claims.put("sub", customUserDetails.getPhoneNumber());
         claims.put("exp", (new Date().getTime() + TOKEN_VALIDITY));
         claims.put("userId", customUserDetails.getUserId());
         claims.put("fullName", customUserDetails.getFullName());
         return Jwts
                 .builder()
                 .setClaims(claims)
-                .setSubject(customUserDetails.getUsername())
+                .setSubject(customUserDetails.getPhoneNumber())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000))
                 .signWith(key(), SignatureAlgorithm.HS256)  // Use HS256 for HMAC
@@ -38,7 +38,10 @@ public class TokenManager {
 
     // Validate JWT Token
     public Boolean validateJwtToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
+        final String username = getPhoneNumberFromToken(token);
+        System.out.println("Phone in token: " + username);
+        System.out.println("UserDetails username: " + userDetails.getUsername());
+
         final Claims claims = Jwts
                 .parserBuilder()
                 .setSigningKey(key())
@@ -47,8 +50,7 @@ public class TokenManager {
         Boolean isTokenExpired = claims.getExpiration().before(new Date());
         return (username.equals(userDetails.getUsername())) && !isTokenExpired;
     }
-    // Extract username from JWT Token
-    public String getUsernameFromToken(String token) {
+    public String getPhoneNumberFromToken(String token) {
         final Claims claims = Jwts
                 .parserBuilder()
                 .setSigningKey(key())
