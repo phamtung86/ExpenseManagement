@@ -27,19 +27,19 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException {
         String tokenHeader = request.getHeader("Authorization");
-        String username = null;
+        String phoneNumber = null;
         String token = null;
 
         try {
             if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
                 token = tokenHeader.substring(7);
-                username = tokenManager.getUsernameFromToken(token); // Trích xuất username từ payload của token.
+                phoneNumber = tokenManager.getPhoneNumberFromToken(token);
             } else {
                 System.out.println("Bearer String not found in token");
             }
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+            if (phoneNumber != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(phoneNumber);
                 if (tokenManager.validateJwtToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
@@ -55,7 +55,7 @@ public class JwtFilter extends OncePerRequestFilter {
             System.out.println("JWT Token has expired");
 
             // Gửi phản hồi lỗi với thông báo token hết hạn
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Mã lỗi 401
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"message\": \"JWT Token has expired\"}");
             return;
