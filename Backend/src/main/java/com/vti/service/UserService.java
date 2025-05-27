@@ -90,13 +90,17 @@ public class UserService implements IUserService{
     @Override
     @Transactional
     public UserResponseDTO updateUser(Integer id, UserRequestDTO userRequestDTO) {
-        Optional<User> isUser = userRepository.findById(id);
-        if (isUser.isEmpty()) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
             throw new RuntimeException("User id khong ton tai");
         }
-        User user = modelMapper.map(userRequestDTO, User.class);
-        user.setId(id);
-        userRepository.save(user);
-        return modelMapper.map(user, UserResponseDTO.class);
+        User userRequest = modelMapper.map(userRequestDTO, User.class);
+        User userNew = user.get();
+        userNew.setPhoneNumber(userRequest.getPhoneNumber());
+        userNew.setFullName(userRequest.getFullName());
+        userNew.setEmail(userRequest.getEmail());
+        userNew.setUpdateAt(new Date());
+        userRepository.save(userNew);
+        return modelMapper.map(userNew, UserResponseDTO.class);
     }
 }
