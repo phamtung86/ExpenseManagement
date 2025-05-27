@@ -2,8 +2,12 @@ package com.vti.repository;
 
 import com.vti.entity.Transactions;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ITransactionRepository extends JpaRepository<Transactions, Integer> {
+public interface ITransactionRepository extends JpaRepository<Transactions, Integer>,
+        JpaSpecificationExecutor<Transactions> {
+
 }
+

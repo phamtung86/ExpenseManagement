@@ -144,7 +144,7 @@ public class AuthController {
                     .body(new ErrorResponse("Success"));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse("Cant find token!!!"));
+                .body(new ErrorResponse("Can't find token!!!"));
     }
 
     @Transactional
