@@ -5,6 +5,7 @@ package com.vti.controller;
 import com.vti.dto.TransactionsDTO;
 import com.vti.dto.filter.TransactionFilter;
 import com.vti.entity.Transactions;
+import com.vti.form.UpdateTransactionForm;
 import com.vti.service.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,24 @@ public class TransactionController {
             return ResponseEntity.status(400).body("Create new transaction failed");
         }
         return ResponseEntity.status(200).body("Create new transaction successfully");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTransaction(@PathVariable int id, @RequestBody UpdateTransactionForm updateTransactionForm) {
+        boolean isUpdate = transactionService.updateTransaction(id, updateTransactionForm);
+        if (isUpdate) {
+            return ResponseEntity.status(200).body("Update transaction successfully");
+        }
+        return ResponseEntity.status(400).body("Update transaction failed");
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteTransaction(@RequestBody List<Integer> ids) {
+        boolean isDelete = transactionService.deleteTransaction(ids);
+        if (isDelete) {
+            return ResponseEntity.status(200).body("Delete transaction successfully");
+        }
+        return ResponseEntity.status(400).body("Delete transaction failed");
     }
 
 }

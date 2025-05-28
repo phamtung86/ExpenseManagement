@@ -9,11 +9,17 @@ import org.springframework.stereotype.Service;
 public class MoneySourceService implements IMoneySourceService{
 
     @Autowired
-    private IMoneySourceRepository MoneySourceRepository;
+    private IMoneySourceRepository moneySourceRepository;
 
     @Override
     public void updateCurrentBalance(Integer id, Double amount) {
-        MoneySources moneySources = MoneySourceRepository.findById(id).get();
+        MoneySources moneySources = moneySourceRepository.findById(id).get();
         moneySources.setCurrentBalance(moneySources.getCurrentBalance() + amount);
+        moneySourceRepository.save(moneySources);
+    }
+
+    @Override
+    public MoneySources findById(Integer id) {
+        return moneySourceRepository.findById(id).orElse(null);
     }
 }
