@@ -8,6 +8,8 @@ import com.vti.entity.Transactions;
 import com.vti.form.UpdateTransactionForm;
 import com.vti.service.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,17 @@ public class TransactionController {
 
     @Autowired
     private ITransactionService transactionService;
+
+    @GetMapping
+    public ResponseEntity<List<TransactionsDTO>> getAllTransactions() {
+        List<TransactionsDTO> transactionsDTO = transactionService.getAllTransactions();
+        return ResponseEntity.ok(transactionsDTO);
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<Page<TransactionsDTO>> getAllTransactions(Pageable pageable) {
+        return ResponseEntity.ok(transactionService.getTransactions(pageable));
+    }
 
     @GetMapping("/filter")
     public List<TransactionsDTO> getFilteredTransactions(@ModelAttribute TransactionFilter filter) {
