@@ -21,6 +21,8 @@ public class TransactionsDTO {
 
     private Date updateAt;
 
+    private String description;
+
     private UserDTO user;
 
     private Integer categoriesId;

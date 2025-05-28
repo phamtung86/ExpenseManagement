@@ -21,11 +21,7 @@ public class Transactions {
     @Column(name = "action")
     private Action action;
 
-    public enum Action{
-        CREATED,
-        UPDATED,
-        DELETED
-    }
+    private String description;
 
     @Column(name = "transaction_date")
     private Date transactionDate;
@@ -49,6 +45,11 @@ public class Transactions {
     @JoinColumn(name = "money_source_id", referencedColumnName = "id")
     private MoneySources moneySources;
 
+    public enum Action{
+        CREATED,
+        UPDATED,
+        DELETED
+    }
 
 }
 

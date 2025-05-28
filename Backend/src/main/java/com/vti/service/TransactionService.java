@@ -3,7 +3,10 @@ package com.vti.service;
 import com.vti.dto.TransactionsDTO;
 import com.vti.dto.UserDTO;
 import com.vti.dto.filter.TransactionFilter;
+import com.vti.entity.Categories;
+import com.vti.entity.MoneySources;
 import com.vti.entity.Transactions;
+import com.vti.form.UpdateTransactionForm;
 import com.vti.repository.ITransactionRepository;
 import com.vti.specification.TransactionSpecificationBuilder;
 import org.modelmapper.ModelMapper;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.Date;
 
@@ -24,6 +28,8 @@ public class TransactionService implements ITransactionService {
     private ModelMapper modelMapper;
     @Autowired
     private IMoneySourceService moneySourceService;
+    @Autowired
+    private ICategoriesService categoriesService;
 
     public List<TransactionsDTO> filterTransactions(TransactionFilter filter) {
         TransactionSpecificationBuilder builder = new TransactionSpecificationBuilder(filter);
@@ -43,6 +49,7 @@ public class TransactionService implements ITransactionService {
                 entity.getAction().name(),
                 entity.getTransactionDate(),
                 entity.getUpdateAt(),
+                entity.getDescription(),
                 new UserDTO(null, entity.getUser().getFullName(), null, null, null, null, null)
                 ,
                 entity.getCategories().getId(),
@@ -69,5 +76,49 @@ public class TransactionService implements ITransactionService {
         }
         moneySourceService.updateCurrentBalance(transactionsDTO.getMoneySourcesId(), amount);
         return transactionRepository.save(transactions);
+    }
+
+    @Transactional
+    @Override
+    public boolean updateTransaction(Integer transactionID,UpdateTransactionForm updateTransactionForm) {
+        Categories categories ;
+        MoneySources moneySources;
+        Transactions transaction = transactionRepository.findById(transactionID).orElse(null);
+
+        if (transaction == null) {
+            return false;
+        }
+        if(!transaction.getCategories().getId().equals(updateTransactionForm.getCategoriesId())){
+            categories = categoriesService.findById(updateTransactionForm.getCategoriesId());
+            transaction.setCategories(categories);
+        }
+        if(!transaction.getMoneySources().getId().equals(updateTransactionForm.getMoneySourcesId())){
+            moneySources = moneySourceService.findById(updateTransactionForm.getMoneySourcesId());
+            transaction.setMoneySources(moneySources);
+        }
+        Double oldAmount = transaction.getAmount();
+        transaction.setDescription(updateTransactionForm.getDescription());
+        if(!transaction.getTransactionDate().equals(updateTransactionForm.getTransactionDate())){
+            transaction.setTransactionDate(updateTransactionForm.getTransactionDate());
+        }
+        transaction.setUpdateAt(new Date());
+        if(updateTransactionForm.getAmount() != transaction.getAmount()){
+            transaction.setAmount(updateTransactionForm.getAmount());
+            moneySourceService.updateCurrentBalance(updateTransactionForm.getMoneySourcesId(), oldAmount - updateTransactionForm.getAmount());
+            transaction.setAmount(updateTransactionForm.getAmount());
+        }
+        transactionRepository.save(transaction);
+        return true;
+    }
+
+    @Override
+    public boolean deleteTransaction(List<Integer> transactionID) {
+        int count = 0;
+        for(Integer i : transactionID){
+            transactionRepository.deleteById(i);
+            count ++;
+        }
+
+        return count > 0;
     }
 }
