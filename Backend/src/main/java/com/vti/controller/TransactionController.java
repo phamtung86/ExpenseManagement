@@ -23,15 +23,15 @@ public class TransactionController {
     @Autowired
     private ITransactionService transactionService;
 
-    @GetMapping
-    public ResponseEntity<List<TransactionsDTO>> getAllTransactions() {
-        List<TransactionsDTO> transactionsDTO = transactionService.getAllTransactions();
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<TransactionsDTO>> getAllTransactions(@PathVariable(name = "id") int userId) {
+        List<TransactionsDTO> transactionsDTO = transactionService.getAllTransactions(userId);
         return ResponseEntity.ok(transactionsDTO);
     }
 
-    @GetMapping("/page")
-    public ResponseEntity<Page<TransactionsDTO>> getAllTransactions(Pageable pageable) {
-        return ResponseEntity.ok(transactionService.getTransactions(pageable));
+    @GetMapping("/page/user/{id}")
+    public ResponseEntity<Page<TransactionsDTO>> getAllPagesTransactions(Pageable pageable, @PathVariable(name = "id") int userId) {
+        return ResponseEntity.ok(transactionService.getTransactions(pageable, userId));
     }
 
     @GetMapping("/filter")
@@ -42,7 +42,6 @@ public class TransactionController {
     @PostMapping
     public ResponseEntity<?> addTransaction(@RequestBody CreateTransactionForm createTransactionForm) {
         Transactions transaction = transactionService.createTransaction(createTransactionForm);
-        System.out.println(transaction);
         if (transaction == null) {
             return ResponseEntity.status(400).body("Create new transaction failed");
         }
@@ -66,5 +65,6 @@ public class TransactionController {
         }
         return ResponseEntity.status(400).body("Delete transaction failed");
     }
+
 
 }

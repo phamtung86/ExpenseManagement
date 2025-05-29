@@ -39,10 +39,10 @@ public class MoneySources {
     @Column(name = "update_at")
     private Date updateAt;
 
-    @OneToMany(mappedBy = "moneySources", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "moneySources", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Transactions> transactions;
 
-    @OneToMany(mappedBy = "moneySources")
+    @OneToMany(mappedBy = "moneySources", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<SpendingLimits> spendingLimits;
 
     public enum MoneySourcesType {

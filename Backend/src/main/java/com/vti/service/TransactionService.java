@@ -13,6 +13,7 @@ import com.vti.specification.TransactionSpecificationBuilder;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService implements ITransactionService {
@@ -32,6 +32,8 @@ public class TransactionService implements ITransactionService {
     private ITransactionRepository transactionRepository;
     @Autowired
     private ModelMapper modelMapper;
+
+    @Lazy
     @Autowired
     private IMoneySourceService moneySourceService;
     @Autowired
@@ -112,6 +114,7 @@ public class TransactionService implements ITransactionService {
             moneySourceService.updateCurrentBalance(updateTransactionForm.getMoneySourcesId(), oldAmount - updateTransactionForm.getAmount());
             transaction.setAmount(updateTransactionForm.getAmount());
         }
+        transaction.setAction(Transactions.Action.UPDATED);
         transactionRepository.save(transaction);
         return true;
     }
@@ -128,8 +131,8 @@ public class TransactionService implements ITransactionService {
     }
 
     @Override
-    public List<TransactionsDTO> getAllTransactions() {
-        List<Transactions> transactions = transactionRepository.findAll();
+    public List<TransactionsDTO> getAllTransactions(Integer userID) {
+        List<Transactions> transactions = transactionRepository.findAllByUserId(userID);
         List<TransactionsDTO> transactionsDTOS = new ArrayList<>();
         for (Transactions transaction : transactions) {
             transactionsDTOS.add(toDTO(transaction));
@@ -138,12 +141,17 @@ public class TransactionService implements ITransactionService {
     }
 
     @Override
-    public Page<TransactionsDTO> getTransactions(Pageable pageable) {
-        Page<Transactions> transactions = transactionRepository.findAll(pageable);
-        List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactions.getContent(), new TypeToken<List<TransactionsDTO>>(){}.getType());
+    public Page<TransactionsDTO> getTransactions(Pageable pageable, Integer userID) {
+        Page<Transactions> transactions = transactionRepository.findAllByUserId(pageable, userID);
+        List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactions.getContent(), new TypeToken<List<TransactionsDTO>>() {
+        }.getType());
         Page<TransactionsDTO> transactionsDTOPage = new PageImpl<>(transactionsDTOS, pageable, transactions.getTotalElements());
         return transactionsDTOPage;
     }
 
+    @Override
+    public Double getAllTotalExpensesByMoneySources(Integer moneySourceID) {
+        return transactionRepository.getAllTotalExpensesByMoneySources(moneySourceID);
+    }
 
 }
