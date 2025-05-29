@@ -5,6 +5,7 @@ package com.vti.controller;
 import com.vti.dto.TransactionsDTO;
 import com.vti.dto.filter.TransactionFilter;
 import com.vti.entity.Transactions;
+import com.vti.form.CreateTransactionForm;
 import com.vti.form.UpdateTransactionForm;
 import com.vti.service.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,8 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addTransaction(@RequestBody TransactionsDTO transactionsDTO) {
-        Transactions transaction = transactionService.createTransaction(transactionsDTO);
+    public ResponseEntity<?> addTransaction(@RequestBody CreateTransactionForm createTransactionForm) {
+        Transactions transaction = transactionService.createTransaction(createTransactionForm);
         System.out.println(transaction);
         if (transaction == null) {
             return ResponseEntity.status(400).body("Create new transaction failed");
