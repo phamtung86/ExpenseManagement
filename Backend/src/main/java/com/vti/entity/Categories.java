@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Entity(name = "categories")
@@ -13,13 +14,13 @@ import java.util.List;
 @NoArgsConstructor
 //@ToString(exclude = {"transactions", "spendingLimits", "transactionTypes"})
 //@EqualsAndHashCode(exclude = {"transactions", "spendingLimits", "transactionTypes"})
-@Getter
 @Setter
-public class Categories {
+@Getter
+public class Categories  extends BaseEntity implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Integer id;
 
     private String name;
 
@@ -37,4 +38,5 @@ public class Categories {
 
     @OneToMany(mappedBy = "categories", fetch = FetchType.EAGER)
     private List<SpendingLimits> spendingLimits;
+
 }

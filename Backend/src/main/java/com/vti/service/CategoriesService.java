@@ -14,7 +14,6 @@ public class CategoriesService implements ICategoriesService{
 
     @Autowired
     private ICategoriesRepository categoriesRepository;
-
     @Override
     public Page<CategoriesDTO> findCategories(String name, Integer parentId, Long transactionTypeId, PageRequest pageRequest) {
         Page<Categories> categoriesPage;

@@ -1,7 +1,6 @@
 package com.vti.utils;
 
 import com.vti.dto.CategoriesDTO;
-import com.vti.dto.MoneySourcesDTO;
 import com.vti.dto.TransactionsDTO;
 import com.vti.entity.Categories;
 import com.vti.entity.MoneySources;
@@ -26,7 +25,7 @@ public class ObjectUtils {
         transactionsDTO.setMoneySourcesName(moneySources.getName());
 
         Categories categories = transactions.getCategories();
-        transactionsDTO.setCategoriesId(categories.getId());
+//        transactionsDTO.setCategoriesId(categories.getId());
         transactionsDTO.setCategoriesName(categories.getName());
 
         return transactionsDTO;
