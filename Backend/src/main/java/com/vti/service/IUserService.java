@@ -1,8 +1,10 @@
 package com.vti.service;
 
+import com.vti.dto.UserDTO;
 import com.vti.entity.User;
 import com.vti.form.CreateUserForm;
 import com.vti.form.ChangePasswordForm;
+import com.vti.form.UpdateUserForm;
 
 public interface IUserService {
 
@@ -22,5 +24,14 @@ public interface IUserService {
     void updatePassword(String email, String password);
 
     boolean changePassword(Integer id, ChangePasswordForm changePasswordForm);
-//    User updateUser(User user);
+
+    boolean updateUser(Integer userId, UpdateUserForm updateUserForm);
+
+    UserDTO getUser(Integer userId);
+
+    boolean existsByEmailAndIdNot(String email, Integer id);
+
+    Integer getCurrentUserId();
+
+    boolean existsByPhoneNumberAndIdNot(String phoneNumber, Integer id);
 }

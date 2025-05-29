@@ -19,8 +19,10 @@ public interface ITransactionService {
 
     boolean deleteTransaction(List<Integer> transactionID);
 
-    List<TransactionsDTO> getAllTransactions();
+    List<TransactionsDTO> getAllTransactions(Integer userID);
 
-    Page<TransactionsDTO> getTransactions(Pageable pageable);
+    Page<TransactionsDTO> getTransactions(Pageable pageable, Integer userID);
+
+    Double getAllTotalExpensesByMoneySources(Integer moneySourceID);
 
 }
