@@ -72,7 +72,6 @@ public class TransactionService implements ITransactionService {
     public Transactions createTransaction(TransactionsDTO transactionsDTO) {
         Transactions transactions = modelMapper.map(transactionsDTO, Transactions.class);
         transactions.setAction(Transactions.Action.CREATED);
-        transactions.setTransactionDate(new Date());
         double amount = 0;
         if (transactionsDTO.getTransactionTypeType().equals("INCOME")) {
             amount = transactionsDTO.getAmount();
