@@ -6,6 +6,7 @@ import com.vti.dto.filter.TransactionFilter;
 import com.vti.entity.Categories;
 import com.vti.entity.MoneySources;
 import com.vti.entity.Transactions;
+import com.vti.form.CreateTransactionForm;
 import com.vti.form.UpdateTransactionForm;
 import com.vti.repository.ITransactionRepository;
 import com.vti.specification.TransactionSpecificationBuilder;
@@ -69,16 +70,16 @@ public class TransactionService implements ITransactionService {
 
     @Transactional
     @Override
-    public Transactions createTransaction(TransactionsDTO transactionsDTO) {
-        Transactions transactions = modelMapper.map(transactionsDTO, Transactions.class);
+    public Transactions createTransaction(CreateTransactionForm createTransactionForm) {
+        Transactions transactions = modelMapper.map(createTransactionForm, Transactions.class);
         transactions.setAction(Transactions.Action.CREATED);
         double amount = 0;
-        if (transactionsDTO.getTransactionTypeType().equals("INCOME")) {
-            amount = transactionsDTO.getAmount();
+        if (createTransactionForm.getTransactionTypeType().equals("INCOME")) {
+            amount = createTransactionForm.getAmount();
         } else {
-            amount = -transactionsDTO.getAmount();
+            amount = -createTransactionForm.getAmount();
         }
-        moneySourceService.updateCurrentBalance(transactionsDTO.getMoneySourcesId(), amount);
+        moneySourceService.updateCurrentBalance(createTransactionForm.getMoneySourcesId(), amount);
         return transactionRepository.save(transactions);
     }
 
