@@ -2,10 +2,6 @@ package com.vti.dto.filter;
 
 import java.util.Date;
 
-/**
- * Lớp DTO dùng để truyền các điều kiện lọc giao dịch từ client.
- * Các trường sẽ được ánh xạ từ query parameters trong API.
- */
 public class TransactionFilter {
 
     // Tên loại giao dịch (TransactionTypes.name)
