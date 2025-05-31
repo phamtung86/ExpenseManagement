@@ -35,8 +35,8 @@ public class TransactionController {
     }
 
     @GetMapping("/filter")
-    public List<TransactionsDTO> getFilteredTransactions(@ModelAttribute TransactionFilter filter) {
-        return transactionService.filterTransactions(filter);
+    public ResponseEntity<List<TransactionsDTO>> getFilteredTransactions(@ModelAttribute TransactionFilter filter) {
+        return ResponseEntity.ok(transactionService.filterTransactions(filter));
     }
 
     @PostMapping
