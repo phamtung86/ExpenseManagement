@@ -1,5 +1,7 @@
 package com.vti.dto.filter;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 public class TransactionFilter {
@@ -14,9 +16,11 @@ public class TransactionFilter {
     private String moneySourceName;
 
     // Lọc từ ngày (>=)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date fromDate;
 
     // Lọc đến ngày (<=)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date toDate;
 
     public TransactionFilter() {}

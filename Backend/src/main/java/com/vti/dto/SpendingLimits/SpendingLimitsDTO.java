@@ -1,9 +1,5 @@
-package com.vti.dto;
+package com.vti.dto.SpendingLimits;
 
-import com.vti.entity.Categories;
-import com.vti.entity.MoneySources;
-import com.vti.entity.SpendingLimits;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +14,7 @@ public class SpendingLimitsDTO {
 
     private Double limitAmount;
 
-    private SpendingLimits.PeriodType periodType;
+    private String periodType;
 
     private Date startDate;
 
@@ -28,16 +24,14 @@ public class SpendingLimitsDTO {
 
     private boolean isActive;
 
-    private Date createdAt;
 
+    private Date createdAt;
     private Date updateAt;
 
-    private String categoriesId;
-
+    private Integer categoriesId;
     private String categoriesName;
 
     private Integer moneySourcesId;
-
     private String moneySourcesName;
 
 }

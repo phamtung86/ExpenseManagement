@@ -1,5 +1,6 @@
 package com.vti.dto;
 
+import com.vti.dto.SpendingLimits.SpendingLimitsDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
