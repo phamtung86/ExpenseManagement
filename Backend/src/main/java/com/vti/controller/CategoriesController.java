@@ -1,7 +1,6 @@
 package com.vti.controller;
 
 import com.vti.dto.CategoriesDTO;
-
 import com.vti.form.CreateCategories;
 import com.vti.form.UpdateCategories;
 import com.vti.service.ICategoriesService;
@@ -12,39 +11,27 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-
-import java.util.List;
-
 @RestController
 @RequestMapping("api/v1/categories")
 public class CategoriesController {
 
 
-@Autowired
-private ICategoriesService categoriesService;
+    @Autowired
+    private ICategoriesService categoriesService;
 
-public CategoriesController(ICategoriesService categoriesService) {
-    this.categoriesService = categoriesService;
-}
+    @GetMapping
+    public List<CategoriesDTO> getAllCategories() {
+        return categoriesService.getAllCategories();
+    }
 
-@GetMapping
-public List<CategoriesDTO> getAllCategories() {
-    return categoriesService.getAllCategories();
-}
     @PostMapping
     public ResponseEntity<?> createCategories(@RequestBody CreateCategories categories) {
         categoriesService.createCategories(categories);
         return new ResponseEntity<>("Created category successfully", HttpStatus.OK);
     }
+
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCategories(@PathVariable int id,@RequestBody UpdateCategories updateCategories) {
+    public ResponseEntity<?> updateCategories(@PathVariable int id, @RequestBody UpdateCategories updateCategories) {
         boolean isUpdated = categoriesService.updateCategories(updateCategories, id);
 
         if (isUpdated) {
@@ -54,6 +41,7 @@ public List<CategoriesDTO> getAllCategories() {
                     .body("Category not found with id = " + id);
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCategories(@PathVariable int id) {
         boolean isDeleted = categoriesService.deleteCategories(id);

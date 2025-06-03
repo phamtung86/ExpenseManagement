@@ -2,14 +2,10 @@ package com.vti.service;
 
 import com.vti.dto.CategoriesDTO;
 import com.vti.entity.Categories;
-
 import com.vti.form.CreateCategories;
 import com.vti.form.UpdateCategories;
-
 import com.vti.repository.ICategoriesRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +13,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.vti.utils.ObjectUtils.convertToDto;
-
-
 @Service
-public class CategoriesService implements ICategoriesService{
+public class CategoriesService implements ICategoriesService {
 
 
     private ICategoriesRepository categoriesRepository;
@@ -33,16 +23,16 @@ public class CategoriesService implements ICategoriesService{
     @Override
     public void createCategories(CreateCategories create) {
         Categories categories = new Categories();
-            categories.setName(create.getName());
-            categories.setParentId(create.getParentId());
-            categories.setIcon(create.getIcon());
-            categoriesRepository.save(categories);
+        categories.setName(create.getName());
+        categories.setParentId(create.getParentId());
+        categories.setIcon(create.getIcon());
+        categoriesRepository.save(categories);
     }
 
     @Override
-    public boolean updateCategories(UpdateCategories update,Integer id) {
+    public boolean updateCategories(UpdateCategories update, Integer id) {
         Categories categories = findById(id);
-        if (categories==null){
+        if (categories == null) {
             return false;
         }
         categories.setName(update.getName());
@@ -55,7 +45,7 @@ public class CategoriesService implements ICategoriesService{
     @Override
     public boolean deleteCategories(Integer id) {
         Optional<Categories> categories = categoriesRepository.findById(id);
-        if (categories.isEmpty()){
+        if (categories.isEmpty()) {
             return false;
         }
         categoriesRepository.deleteById(id);
@@ -67,10 +57,6 @@ public class CategoriesService implements ICategoriesService{
         return categoriesRepository.findById(id).orElse(null);
     }
 
-    @Override
-    public Categories findById(int id) {return categoriesRepository.findById(id).orElse(null);}
-
-
     public List<CategoriesDTO> getAllCategories() {
         List<Categories> allCategories = categoriesRepository.findAll();
 
@@ -81,8 +67,6 @@ public class CategoriesService implements ICategoriesService{
         for (CategoriesDTO rootDTO : root) {
             getChild(rootDTO, allCategories);
         }
-
-
 
 
         return root;
@@ -121,10 +105,5 @@ public class CategoriesService implements ICategoriesService{
 
         );
     }
-
-
-        );
-    }
-
 
 }
