@@ -1,5 +1,6 @@
 package com.vti.controller;
 
+import com.vti.dto.CategoriesDTO;
 import com.vti.form.CreateCategories;
 import com.vti.form.UpdateCategories;
 import com.vti.service.ICategoriesService;
@@ -13,16 +14,18 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/categories")
 public class CategoriesController {
-//    @Autowired
-//    private ICategoriesRepository categoriesRepository;
-//
-//    @GetMapping
-//    public List<Categories> getAllCategories() {
-//        return categoriesRepository.findAll();
-//    }
+
 @Autowired
 private ICategoriesService categoriesService;
 
+public CategoriesController(ICategoriesService categoriesService) {
+    this.categoriesService = categoriesService;
+}
+
+@GetMapping
+public List<CategoriesDTO> getAllCategories() {
+    return categoriesService.getAllCategories();
+}
     @PostMapping
     public ResponseEntity<?> createCategories(@RequestBody CreateCategories categories) {
         categoriesService.createCategories(categories);
