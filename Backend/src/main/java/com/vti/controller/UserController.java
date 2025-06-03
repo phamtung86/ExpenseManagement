@@ -1,12 +1,17 @@
 package com.vti.controller;
 
 import com.vti.dto.UserDTO;
+
+import com.vti.dto.UserRequestDTO;
+import com.vti.dto.UserResponseDTO;
+
 import com.vti.form.ChangePasswordForm;
 import com.vti.form.UpdateUserForm;
 import com.vti.service.IUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +37,7 @@ public class UserController {
                     : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Change password failed");
     }
 
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable int id, @Valid @RequestBody UpdateUserForm updateUserForm) {
         boolean isUpdate = userService.updateUser(id, updateUserForm);
@@ -39,6 +45,19 @@ public class UserController {
             return ResponseEntity.ok("Update user success");
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update user failed");
+    }
+
+
+    @GetMapping("/get-user-info/{id}")
+    public  ResponseEntity<UserResponseDTO> getUserById(@PathVariable Integer id){
+        UserResponseDTO userResponseDTO = userService.getUserById(id);
+        return ResponseEntity.ok(userResponseDTO);
+    }
+
+    @PutMapping("/update-user-info/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO userRequestDTO){
+        UserResponseDTO userResponseDTO = userService.updateUser(id, userRequestDTO);
+        return ResponseEntity.ok(userResponseDTO);
     }
 
 }
