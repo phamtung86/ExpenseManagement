@@ -2,22 +2,74 @@ package com.vti.service;
 
 import com.vti.dto.CategoriesDTO;
 import com.vti.entity.Categories;
+
+import com.vti.form.CreateCategories;
+import com.vti.form.UpdateCategories;
+
 import com.vti.repository.ICategoriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.vti.utils.ObjectUtils.convertToDto;
 
+
 @Service
 public class CategoriesService implements ICategoriesService{
 
-    @Autowired
+
     private ICategoriesRepository categoriesRepository;
+
+
+    @Override
+    public void createCategories(CreateCategories create) {
+        Categories categories = new Categories();
+            categories.setName(create.getName());
+            categories.setParentId(create.getParentId());
+            categories.setIcon(create.getIcon());
+            categoriesRepository.save(categories);
+    }
+
+    @Override
+    public boolean updateCategories(UpdateCategories update,Integer id) {
+        Categories categories = findById(id);
+        if (categories==null){
+            return false;
+        }
+        categories.setName(update.getName());
+        categories.setParentId(update.getParentId());
+        categories.setIcon(update.getIcon());
+        categoriesRepository.save(categories);
+        return true;
+    }
+
+    @Override
+    public boolean deleteCategories(Integer id) {
+        Optional<Categories> categories = categoriesRepository.findById(id);
+        if (categories.isEmpty()){
+            return false;
+        }
+        categoriesRepository.deleteById(id);
+        return true;
+    }
+
+    @Override
+    public Categories findById(int id) {
+        return categoriesRepository.findById(id).orElse(null);
+    }
+
     @Override
     public Categories findById(int id) {return categoriesRepository.findById(id).orElse(null);}
+
 
     public List<CategoriesDTO> getAllCategories() {
         List<Categories> allCategories = categoriesRepository.findAll();
@@ -30,6 +82,9 @@ public class CategoriesService implements ICategoriesService{
             getChild(rootDTO, allCategories);
         }
 
+
+
+
         return root;
     }
 
@@ -39,10 +94,17 @@ public class CategoriesService implements ICategoriesService{
                 .filter(categories -> categories.getParentId() != null && categories.getParentId().equals(root.getId()))
                 .map(categories -> convertToDto(categories))
                 .collect(Collectors.toList());
+
+        root.setChildren((chils));
+        for (CategoriesDTO child : chils) {
+            getChild(child, allCategories);
+        }
+
         root.setChildren(chils);
         for (CategoriesDTO child : chils) {
             getChild(child, allCategories);
         }
+
 
         return chils;
     }
@@ -59,5 +121,10 @@ public class CategoriesService implements ICategoriesService{
 
         );
     }
+
+
+        );
+    }
+
 
 }

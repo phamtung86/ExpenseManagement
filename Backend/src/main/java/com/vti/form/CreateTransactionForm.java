@@ -1,15 +1,11 @@
-package com.vti.dto;
+package com.vti.form;
 
-import lombok.*;
+import lombok.Data;
 
 import java.util.Date;
 
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class TransactionsDTO {
+@Data
+public class CreateTransactionForm {
 
     private Integer id;
 
@@ -23,19 +19,14 @@ public class TransactionsDTO {
 
     private String description;
 
-    private UserDTO user;
+    private Integer userId;
 
     private Integer categoriesId;
 
-    private String categoriesName;
-
     private String transactionTypesId;
-
-    private String transactionTypesName;
 
     private String transactionTypeType;
 
     private Integer moneySourcesId;
 
-    private String moneySourcesName;
 }
