@@ -1,6 +1,7 @@
 package com.vti.controller;
 
 import com.vti.dto.CategoriesDTO;
+
 import com.vti.form.CreateCategories;
 import com.vti.form.UpdateCategories;
 import com.vti.service.ICategoriesService;
@@ -11,9 +12,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/categories")
 public class CategoriesController {
+
 
 @Autowired
 private ICategoriesService categoriesService;
@@ -51,5 +63,7 @@ public List<CategoriesDTO> getAllCategories() {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Category not found with id = " + id);
         }
+
+
     }
 }
