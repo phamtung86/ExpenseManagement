@@ -10,7 +10,7 @@ public interface IMoneySourceService {
 
     void updateCurrentBalance(Integer id, Double amount);
 
-    List<MoneySourcesDTO> getAllMoneySources();
+    List<MoneySourcesDTO> getAllMoneySources(Integer userId);
 
     MoneySources findById(Integer id);
 
@@ -19,4 +19,6 @@ public interface IMoneySourceService {
     boolean updateMoneySource(Integer id, MoneySourceForm updateMoneySourceForm);
 
     boolean deleteMoneySource(Integer id);
+
+    Double getTotalCurrentBalance(Integer userId);
 }

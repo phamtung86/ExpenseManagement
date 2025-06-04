@@ -142,27 +142,28 @@ public class UserService implements IUserService {
     @Override
     public boolean existsByPhoneNumberAndIdNot(String phoneNumber, Integer id) {
         return userRepository.existsByPhoneNumberAndIdNot(phoneNumber, id);
-
-    public UserResponseDTO getUserById(Integer id) {
-        Optional<User> user = userRepository.findById(id);
-        return modelMapper.map(user, UserResponseDTO.class);
-
     }
-
-    @Override
-    @Transactional
-    public UserResponseDTO updateUser(Integer id, UserRequestDTO userRequestDTO) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new RuntimeException("User id khong ton tai");
-        }
-        User userRequest = modelMapper.map(userRequestDTO, User.class);
-        User userNew = user.get();
-        userNew.setPhoneNumber(userRequest.getPhoneNumber());
-        userNew.setFullName(userRequest.getFullName());
-        userNew.setEmail(userRequest.getEmail());
-        userNew.setUpdateAt(new Date());
-        userRepository.save(userNew);
-        return modelMapper.map(userNew, UserResponseDTO.class);
-    }
+//
+//    public UserResponseDTO getUserById(Integer id) {
+//        Optional<User> user = userRepository.findById(id);
+//        return modelMapper.map(user, UserResponseDTO.class);
+//
+//    }
+//
+//    @Override
+//    @Transactional
+//    public UserResponseDTO updateUser(Integer id, UserRequestDTO userRequestDTO) {
+//        Optional<User> user = userRepository.findById(id);
+//        if (user.isEmpty()) {
+//            throw new RuntimeException("User id khong ton tai");
+//        }
+//        User userRequest = modelMapper.map(userRequestDTO, User.class);
+//        User userNew = user.get();
+//        userNew.setPhoneNumber(userRequest.getPhoneNumber());
+//        userNew.setFullName(userRequest.getFullName());
+//        userNew.setEmail(userRequest.getEmail());
+//        userNew.setUpdateAt(new Date());
+//        userRepository.save(userNew);
+//        return modelMapper.map(userNew, UserResponseDTO.class);
+//    }
 }

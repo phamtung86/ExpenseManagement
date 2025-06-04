@@ -17,9 +17,9 @@ public class MoneySourceController {
     @Autowired
     private IMoneySourceService moneySourceService;
 
-    @GetMapping
-    public ResponseEntity<List<MoneySourcesDTO>> getAllMoneySources() {
-        return ResponseEntity.ok(moneySourceService.getAllMoneySources());
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<MoneySourcesDTO>> getAllMoneySources(@PathVariable(name = "userId") int userId) {
+        return ResponseEntity.ok(moneySourceService.getAllMoneySources(userId));
     }
 
     @PostMapping
@@ -44,6 +44,11 @@ public class MoneySourceController {
             return ResponseEntity.ok().body("Successfully updated money source");
         }
         return ResponseEntity.badRequest().body("Failed to update money source");
+    }
+
+    @GetMapping("/current-balance/user/{id}")
+    public ResponseEntity<?> getCurrentBalance(@PathVariable(name = "id") int id) {
+        return ResponseEntity.status(200).body(moneySourceService.getTotalCurrentBalance(id));
     }
 
 }

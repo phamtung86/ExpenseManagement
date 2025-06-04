@@ -5,6 +5,7 @@ import com.vti.dto.UserDTO;
 import com.vti.dto.filter.TransactionFilter;
 import com.vti.entity.Categories;
 import com.vti.entity.MoneySources;
+import com.vti.entity.SpendingLimits;
 import com.vti.entity.Transactions;
 import com.vti.form.CreateTransactionForm;
 import com.vti.form.UpdateTransactionForm;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +40,8 @@ public class TransactionService implements ITransactionService {
     private IMoneySourceService moneySourceService;
     @Autowired
     private ICategoriesService categoriesService;
+    @Autowired
+    private ISpendingLimitsService spendingLimitsService;
 
     public List<TransactionsDTO> filterTransactions(TransactionFilter filter) {
         TransactionSpecificationBuilder builder = new TransactionSpecificationBuilder(filter);
@@ -79,6 +83,12 @@ public class TransactionService implements ITransactionService {
         if (createTransactionForm.getTransactionTypeType().equals("INCOME")) {
             amount = createTransactionForm.getAmount();
         } else {
+            SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesId(createTransactionForm.getCategoriesId(), createTransactionForm.getMoneySourcesId());
+            if (spendingLimits != null) {
+                if (spendingLimits.isActive()) {
+                    spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() + createTransactionForm.getAmount());
+                }
+            }
             amount = -createTransactionForm.getAmount();
         }
         moneySourceService.updateCurrentBalance(createTransactionForm.getMoneySourcesId(), amount);
@@ -152,6 +162,43 @@ public class TransactionService implements ITransactionService {
     @Override
     public Double getAllTotalExpensesByMoneySources(Integer moneySourceID) {
         return transactionRepository.getAllTotalExpensesByMoneySources(moneySourceID);
+    }
+
+    @Override
+    public Double getAllTotalExpensesByTime(String type, Integer userId) {
+        LocalDate now = LocalDate.now();
+        switch (type.toUpperCase()) {
+            case "DAY":
+                return transactionRepository.getTotalExpenseByDay(now.getDayOfMonth(), now.getMonthValue(), now.getYear(), userId);
+            case "MONTH":
+                return transactionRepository.getTotalExpenseByMonth(now.getMonthValue(), now.getYear(), userId);
+            case "YEAR":
+                return transactionRepository.getTotalExpenseByYear(now.getYear(), userId);
+            default:
+                throw new IllegalArgumentException("Type phải là: DAY, MONTH, hoặc YEAR");
+        }
+
+    }
+
+    @Override
+    public Double getAllTotalIncomesByTime(String type, Integer userId) {
+        LocalDate now = LocalDate.now();
+        switch (type.toUpperCase()) {
+            case "DAY":
+                return transactionRepository.getTotalIncomeByDay(now.getDayOfMonth(), now.getMonthValue(), now.getYear(), userId);
+            case "MONTH":
+                return transactionRepository.getTotalIncomeByMonth(now.getMonthValue(), now.getYear(), userId);
+            case "YEAR":
+                return transactionRepository.getTotalIncomeByYear(now.getYear(), userId);
+            default:
+                throw new IllegalArgumentException("Type phải là: DAY, MONTH, hoặc YEAR");
+        }
+    }
+
+    @Override
+    public List<TransactionsDTO> getRecentTransactions(Integer userID, int limit) {
+        List<Transactions> transactions = transactionRepository.findRecentTransactionsByUserId(userID, limit);
+        return modelMapper.map(transactions, new TypeToken<List<TransactionsDTO>>() {}.getType());
     }
 
 }

@@ -45,6 +45,10 @@ public class MoneySources {
     @OneToMany(mappedBy = "moneySources", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<SpendingLimits> spendingLimits;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
     public enum MoneySourcesType {
         CASH, BANK, EWALLET, OTHER,
     }

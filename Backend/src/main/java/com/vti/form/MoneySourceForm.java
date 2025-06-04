@@ -15,6 +15,8 @@ public class MoneySourceForm {
 
     private String type;
 
+    private Integer userId;
+
     public boolean isActive;
 
 }

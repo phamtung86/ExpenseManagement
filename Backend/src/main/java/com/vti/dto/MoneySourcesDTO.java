@@ -29,6 +29,10 @@ public class MoneySourcesDTO {
 
     private Date updateAt;
 
+    private Integer userId;
+
+    private String userFullName;
+
     private List<TransactionsDTO> transactions;
 
     private List<SpendingLimitsDTO> spendingLimits;

@@ -85,6 +85,20 @@ public class SpendingLimitsService implements ISpendingLimitsService {
         spendingLimitsRepository.deleteById(id);
     }
 
+    @Override
+    public SpendingLimits findByCategoriesIdAndMoneySourcesId(Integer categoriesId, Integer moneySourcesId) {
+        return spendingLimitsRepository.findByCategoriesIdAndMoneySourcesId(categoriesId, moneySourcesId);
+    }
+
+    @Override
+    public void updateActualSpent(Integer id, Double actualSpent) {
+        SpendingLimits entity = spendingLimitsRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hạn mức"));
+        entity.setActualSpent(actualSpent);
+        entity.setUpdateAt(new Date());
+        spendingLimitsRepository.save(entity);
+    }
+
     private SpendingLimitsDTO toDTO(SpendingLimits entity) {
         return new SpendingLimitsDTO(
                 entity.getId(),
