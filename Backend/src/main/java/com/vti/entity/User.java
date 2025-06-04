@@ -39,4 +39,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<PasswordResetToken> passwordResetTokens;
+
+    @OneToMany(mappedBy = "user")
+    private List<MoneySources> moneySources;
 }

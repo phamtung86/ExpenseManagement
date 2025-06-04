@@ -5,6 +5,9 @@ import com.vti.entity.Categories;
 import com.vti.form.CreateCategories;
 import com.vti.form.UpdateCategories;
 import com.vti.repository.ICategoriesRepository;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,7 +20,10 @@ import java.util.stream.Collectors;
 public class CategoriesService implements ICategoriesService {
 
 
+    @Autowired
     private ICategoriesRepository categoriesRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
 
     @Override
@@ -57,7 +63,7 @@ public class CategoriesService implements ICategoriesService {
         return categoriesRepository.findById(id).orElse(null);
     }
 
-    public List<CategoriesDTO> getAllCategories() {
+    public List<CategoriesDTO> getAllCategoriesWithParentChild() {
         List<Categories> allCategories = categoriesRepository.findAll();
 
         List<CategoriesDTO> root = allCategories.stream()
@@ -70,6 +76,13 @@ public class CategoriesService implements ICategoriesService {
 
 
         return root;
+    }
+
+    @Override
+    public List<CategoriesDTO> getAllCategories() {
+        List<Categories> allCategories = categoriesRepository.findAll();
+        List<CategoriesDTO> categoriesDTOS = modelMapper.map(allCategories, new TypeToken<List<CategoriesDTO>>() {}.getType());
+        return categoriesDTOS;
     }
 
     private List<CategoriesDTO> getChild(CategoriesDTO root, List<Categories> allCategories) {

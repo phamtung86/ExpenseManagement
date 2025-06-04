@@ -30,8 +30,8 @@ public class MoneySourceService implements IMoneySourceService {
     }
 
     @Override
-    public List<MoneySourcesDTO> getAllMoneySources() {
-        List<MoneySources> moneySources = moneySourceRepository.findAll();
+    public List<MoneySourcesDTO> getAllMoneySources(Integer userId) {
+        List<MoneySources> moneySources = moneySourceRepository.findByUserId(userId);
         return modelMapper.map(moneySources, new TypeToken<List<MoneySourcesDTO>>() {
         }.getType());
     }
@@ -44,6 +44,7 @@ public class MoneySourceService implements IMoneySourceService {
     @Override
     public MoneySources createNewMoneySource(MoneySourceForm createMoneySourceForm) {
         MoneySources moneySources = modelMapper.map(createMoneySourceForm, MoneySources.class);
+        moneySources.setId(null);
         moneySources.setCreatedAt(new Date());
         moneySources.setActive(true);
         return moneySourceRepository.save(moneySources);
@@ -73,5 +74,10 @@ public class MoneySourceService implements IMoneySourceService {
         }
         moneySourceRepository.deleteById(id);
         return true;
+    }
+
+    @Override
+    public Double getTotalCurrentBalance(Integer userId) {
+        return moneySourceRepository.getTotalCurrentBalance(userId);
     }
 }

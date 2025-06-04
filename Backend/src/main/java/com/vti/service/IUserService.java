@@ -38,10 +38,10 @@ public interface IUserService {
     Integer getCurrentUserId();
 
     boolean existsByPhoneNumberAndIdNot(String phoneNumber, Integer id);
-
-    UserResponseDTO getUserById(Integer id);
-
-    UserResponseDTO updateUser(Integer id, UserRequestDTO userRequestDTO);
-//    User updateUser(User user);
+//
+//    UserResponseDTO getUserById(Integer id);
+//
+//    UserResponseDTO updateUser(Integer id, UserRequestDTO userRequestDTO);
+////    User updateUser(User user);
 
 }

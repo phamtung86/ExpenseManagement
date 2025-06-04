@@ -1,5 +1,6 @@
 package com.vti.repository;
 
+import com.vti.dto.TransactionsDTO;
 import com.vti.entity.Transactions;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,39 @@ public interface ITransactionRepository extends JpaRepository<Transactions, Inte
     @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 2 AND t.moneySources.id = :id")
     Double getAllTotalExpensesByMoneySources(@Param("id") Integer id);
 
+    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 2 AND FUNCTION('day', t.transactionDate) = :day AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    Double getTotalExpenseByDay(@Param("day") int day,
+                         @Param("month") int month,
+                         @Param("year") int year,
+                         @Param("userId") int userId);
+
+    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 2 AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    Double getTotalExpenseByMonth(@Param("month") int month,
+                           @Param("year") int year,
+                           @Param("userId") int userId);
+
+    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 2 AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    Double getTotalExpenseByYear(@Param("year") int year,
+                          @Param("userId") int userId);
+
+    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 1 AND FUNCTION('day', t.transactionDate) = :day AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    Double getTotalIncomeByDay(@Param("day") int day,
+                                @Param("month") int month,
+                                @Param("year") int year,
+                                @Param("userId") int userId);
+
+    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 1 AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    Double getTotalIncomeByMonth(@Param("month") int month,
+                                  @Param("year") int year,
+                                  @Param("userId") int userId);
+
+    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 1 AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    Double getTotalIncomeByYear(@Param("year") int year,
+                                 @Param("userId") int userId);
+
+
+    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId ORDER BY t.transactionDate DESC LIMIT :limit")
+    List<Transactions> findRecentTransactionsByUserId(@Param("userId") Integer userId, @Param("limit") int limit);
 
 }
 

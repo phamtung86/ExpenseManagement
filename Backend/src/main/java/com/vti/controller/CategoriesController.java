@@ -20,7 +20,12 @@ public class CategoriesController {
     private ICategoriesService categoriesService;
 
     @GetMapping
-    public List<CategoriesDTO> getAllCategories() {
+    public ResponseEntity<List<CategoriesDTO>> getAllCategories() {
+        return new ResponseEntity<>(categoriesService.getAllCategories(), HttpStatus.OK);
+    }
+
+    @GetMapping("/parent-child")
+    public List<CategoriesDTO> getAllCategoriesWithParentChild() {
         return categoriesService.getAllCategories();
     }
 

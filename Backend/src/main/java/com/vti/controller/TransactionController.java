@@ -66,5 +66,18 @@ public class TransactionController {
         return ResponseEntity.status(400).body("Delete transaction failed");
     }
 
+    @GetMapping("/total-expense/user/{userID}")
+    public ResponseEntity<Double> getTotalExpense(@RequestParam(name = "type") String type, @PathVariable("userID") Integer userId) {
+        return ResponseEntity.status(200).body(transactionService.getAllTotalExpensesByTime(type,userId));
+    }
 
+    @GetMapping("/total-income/user/{userID}")
+    public ResponseEntity<Double> getTotalIncome(@RequestParam(name = "type") String type, @PathVariable("userID") Integer userId) {
+        return ResponseEntity.status(200).body(transactionService.getAllTotalIncomesByTime(type,userId));
+    }
+
+    @GetMapping("/recent-transactions/user/{userId}/limit/{limit}")
+    public ResponseEntity<List<TransactionsDTO>> getRecentTransactions(@PathVariable(name = "userId") Integer userId, @PathVariable(name = "limit") int limit) {
+        return ResponseEntity.status(200).body(transactionService.getRecentTransactions(userId, limit));
+    }
 }
