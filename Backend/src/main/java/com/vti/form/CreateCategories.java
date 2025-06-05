@@ -7,4 +7,5 @@ public class CreateCategories {
     private String name;
     private Integer parentId;
     private String icon;
+    private Integer transactionTypesId;
 }

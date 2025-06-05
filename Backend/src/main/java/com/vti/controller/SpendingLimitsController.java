@@ -45,7 +45,10 @@ public class SpendingLimitsController {
     public ResponseEntity<?> createSpendingLimit(@RequestBody SpendingLimitsCreateRequest request) {
         try {
             SpendingLimitsDTO created = spendingLimitsService.create(request);
-            return ResponseEntity.status(201).body(created);
+            if (created != null) {
+                return ResponseEntity.ok("Created spending limit successfully");
+            }
+            return ResponseEntity.status(500).body("Failed to create spending limit");
         } catch (Exception e) {
             return ResponseEntity.status(400).body("Create spending limit failed");
         }
@@ -57,7 +60,10 @@ public class SpendingLimitsController {
                                                  @RequestBody SpendingLimitsUpdateRequest request) {
         try {
             SpendingLimitsDTO updated = spendingLimitsService.update(id, request);
-            return ResponseEntity.ok(updated);
+            if (updated != null) {
+                return ResponseEntity.ok("Updated spending limit successfully");
+            }
+            return ResponseEntity.status(500).body("Failed to update spending limit");
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(404).body("Spending limit not found");
         } catch (Exception e) {
