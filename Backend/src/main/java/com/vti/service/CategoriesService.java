@@ -28,10 +28,13 @@ public class CategoriesService implements ICategoriesService {
 
     @Override
     public void createCategories(CreateCategories create) {
-        Categories categories = new Categories();
-        categories.setName(create.getName());
-        categories.setParentId(create.getParentId());
-        categories.setIcon(create.getIcon());
+//        Categories categories = new Categories();
+//        categories.setName(create.getName());
+//        categories.setParentId(create.getParentId());
+//        categories.setIcon(create.getIcon());
+        Categories categories = modelMapper.map(create, Categories.class);
+        categories.setId(null);
+
         categoriesRepository.save(categories);
     }
 

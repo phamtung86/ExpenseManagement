@@ -26,7 +26,7 @@ public class CategoriesController {
 
     @GetMapping("/parent-child")
     public List<CategoriesDTO> getAllCategoriesWithParentChild() {
-        return categoriesService.getAllCategories();
+        return categoriesService.getAllCategoriesWithParentChild();
     }
 
     @PostMapping

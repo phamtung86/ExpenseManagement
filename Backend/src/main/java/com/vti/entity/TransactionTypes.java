@@ -20,10 +20,10 @@ public class TransactionTypes {
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    @OneToMany(mappedBy = "transactionTypes", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "transactionTypes", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<Categories> categories;
 
-    @OneToMany(mappedBy = "transactionTypes", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "transactionTypes", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<Transactions> transactions;
 
 
