@@ -160,12 +160,12 @@ public class TransactionService implements ITransactionService {
     }
 
     @Override
-    public Double getAllTotalExpensesByMoneySources(Integer moneySourceID) {
+    public double getAllTotalExpensesByMoneySources(Integer moneySourceID) {
         return transactionRepository.getAllTotalExpensesByMoneySources(moneySourceID);
     }
 
     @Override
-    public Double getAllTotalExpensesByTime(String type, Integer userId) {
+    public double getAllTotalExpensesByTime(String type, Integer userId) {
         LocalDate now = LocalDate.now();
         switch (type.toUpperCase()) {
             case "DAY":
@@ -181,7 +181,7 @@ public class TransactionService implements ITransactionService {
     }
 
     @Override
-    public Double getAllTotalIncomesByTime(String type, Integer userId) {
+    public double getAllTotalIncomesByTime(String type, Integer userId) {
         LocalDate now = LocalDate.now();
         switch (type.toUpperCase()) {
             case "DAY":

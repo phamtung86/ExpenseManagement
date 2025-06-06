@@ -23,11 +23,11 @@ public interface ITransactionService {
 
     Page<TransactionsDTO> getTransactions(Pageable pageable, Integer userID);
 
-    Double getAllTotalExpensesByMoneySources(Integer moneySourceID);
+    double getAllTotalExpensesByMoneySources(Integer moneySourceID);
 
-    Double getAllTotalExpensesByTime(String type, Integer userID);
+    double getAllTotalExpensesByTime(String type, Integer userID);
 
-    Double getAllTotalIncomesByTime(String type, Integer userID);
+    double getAllTotalIncomesByTime(String type, Integer userID);
 
     List<TransactionsDTO> getRecentTransactions(Integer userID, int limit);
 }
