@@ -16,7 +16,7 @@ public interface IMoneySourceRepository extends JpaRepository<MoneySources, Inte
     @EntityGraph(value = "MoneySources.full")
     List<MoneySources> findByUserId(Integer userId);
 
-    @Query("SELECT SUM(m.currentBalance) FROM money_source m WHERE m.user.id = :id")
-    Double getTotalCurrentBalance(@Param("id") Integer id);
+    @Query("SELECT COALESCE(SUM(m.currentBalance), 0.0) FROM money_source m WHERE m.user.id = :id")
+    double getTotalCurrentBalance(@Param("id") Integer id);
 
 }

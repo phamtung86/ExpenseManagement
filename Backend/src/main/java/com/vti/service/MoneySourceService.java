@@ -86,7 +86,7 @@ public class MoneySourceService implements IMoneySourceService {
     }
 
     @Override
-    public Double getTotalCurrentBalance(Integer userId) {
+    public double getTotalCurrentBalance(Integer userId) {
         return moneySourceRepository.getTotalCurrentBalance(userId);
     }
 }

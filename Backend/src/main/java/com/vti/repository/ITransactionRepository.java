@@ -22,33 +22,33 @@ public interface ITransactionRepository extends JpaRepository<Transactions, Inte
     @Query("SELECT COALESCE(SUM(t.amount), 0.0) FROM transactions t WHERE t.transactionTypes.id = 2 AND t.moneySources.id = :id")
     double getAllTotalExpensesByMoneySources(@Param("id") Integer id);
 
-    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 2 AND FUNCTION('day', t.transactionDate) = :day AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    @Query("SELECT COALESCE(SUM(t.amount), 0.0) FROM transactions t WHERE t.transactionTypes.id = 2 AND FUNCTION('day', t.transactionDate) = :day AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
     double getTotalExpenseByDay(@Param("day") int day,
                          @Param("month") int month,
                          @Param("year") int year,
                          @Param("userId") int userId);
 
-    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 2 AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    @Query("SELECT COALESCE(SUM(t.amount), 0.0) FROM transactions t WHERE t.transactionTypes.id = 2 AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
     double getTotalExpenseByMonth(@Param("month") int month,
                            @Param("year") int year,
                            @Param("userId") int userId);
 
-    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 2 AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    @Query("SELECT COALESCE(SUM(t.amount), 0.0) FROM transactions t WHERE t.transactionTypes.id = 2 AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
     double getTotalExpenseByYear(@Param("year") int year,
                           @Param("userId") int userId);
 
-    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 1 AND FUNCTION('day', t.transactionDate) = :day AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    @Query("SELECT COALESCE(SUM(t.amount), 0.0) FROM transactions t WHERE t.transactionTypes.id = 1 AND FUNCTION('day', t.transactionDate) = :day AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
     double getTotalIncomeByDay(@Param("day") int day,
                                 @Param("month") int month,
                                 @Param("year") int year,
                                 @Param("userId") int userId);
 
-    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 1 AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    @Query("SELECT COALESCE(SUM(t.amount), 0.0) FROM transactions t WHERE t.transactionTypes.id = 1 AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
     double getTotalIncomeByMonth(@Param("month") int month,
                                   @Param("year") int year,
                                   @Param("userId") int userId);
 
-    @Query("SELECT SUM(t.amount) FROM transactions t WHERE t.transactionTypes.id = 1 AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
+    @Query("SELECT COALESCE(SUM(t.amount), 0.0) FROM transactions t WHERE t.transactionTypes.id = 1 AND FUNCTION('year', t.transactionDate) = :year AND t.user.id = :userId")
     double getTotalIncomeByYear(@Param("year") int year,
                                  @Param("userId") int userId);
 
