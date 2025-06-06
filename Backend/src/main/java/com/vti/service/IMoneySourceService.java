@@ -20,5 +20,5 @@ public interface IMoneySourceService {
 
     boolean deleteMoneySource(Integer id);
 
-    Double getTotalCurrentBalance(Integer userId);
+    double getTotalCurrentBalance(Integer userId);
 }

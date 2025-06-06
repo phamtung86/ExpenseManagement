@@ -52,20 +52,29 @@ public class MoneySourceService implements IMoneySourceService {
 
     @Override
     public boolean updateMoneySource(Integer id, MoneySourceForm updateMoneySourceForm) {
-        MoneySources moneySources = findById(id);
-        Double totalExpenses = transactionService.getAllTotalExpensesByMoneySources(id);
-        moneySources = modelMapper.map(updateMoneySourceForm, MoneySources.class);
-        if (totalExpenses > updateMoneySourceForm.getCurrentBalance()) {
-            moneySources.setCurrentBalance(updateMoneySourceForm.getCurrentBalance() - totalExpenses);
-        }
-        if (moneySources == null) {
+        MoneySources existingMoneySource = findById(id);
+        if (existingMoneySource == null) {
             return false;
         }
-        moneySources.setId(id);
-        moneySources.setActive(true);
-        moneySourceRepository.save(moneySources);
+
+        double totalExpenses = transactionService.getAllTotalExpensesByMoneySources(id);
+
+        MoneySources updatedMoneySource = modelMapper.map(updateMoneySourceForm, MoneySources.class);
+
+        if (totalExpenses > updateMoneySourceForm.getCurrentBalance()) {
+            updatedMoneySource.setCurrentBalance(updateMoneySourceForm.getCurrentBalance() - totalExpenses);
+        }
+
+        updatedMoneySource.setId(id);
+        updatedMoneySource.setCreatedAt(existingMoneySource.getCreatedAt());
+        updatedMoneySource.setUser(existingMoneySource.getUser());
+        updatedMoneySource.setActive(true);
+        updatedMoneySource.setUpdateAt(new Date());
+
+        moneySourceRepository.save(updatedMoneySource);
         return true;
     }
+
 
     @Override
     public boolean deleteMoneySource(Integer id) {
@@ -77,7 +86,7 @@ public class MoneySourceService implements IMoneySourceService {
     }
 
     @Override
-    public Double getTotalCurrentBalance(Integer userId) {
+    public double getTotalCurrentBalance(Integer userId) {
         return moneySourceRepository.getTotalCurrentBalance(userId);
     }
 }
