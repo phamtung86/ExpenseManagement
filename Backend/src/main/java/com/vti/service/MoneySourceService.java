@@ -72,7 +72,7 @@ public class MoneySourceService implements IMoneySourceService {
         updatedMoneySource.setActive(updateMoneySourceForm.isActive());
         updatedMoneySource.setUpdateAt(new Date());
 
-//        moneySourceRepository.save(updatedMoneySource);
+        moneySourceRepository.save(updatedMoneySource);
         return true;
     }
 
