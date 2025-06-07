@@ -1,10 +1,13 @@
 package com.vti.dto.SpendingLimits;
 
+import com.vti.dto.UserDTO;
+import com.vti.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,7 +27,6 @@ public class SpendingLimitsDTO {
 
     private boolean isActive;
 
-
     private Date createdAt;
     private Date updateAt;
 
@@ -32,6 +34,11 @@ public class SpendingLimitsDTO {
     private String categoriesName;
 
     private Integer moneySourcesId;
+
     private String moneySourcesName;
+
+    private Integer userId;
+
+    private String userFullName;
 
 }

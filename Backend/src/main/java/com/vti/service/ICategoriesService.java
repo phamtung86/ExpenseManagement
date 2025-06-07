@@ -14,7 +14,7 @@ public interface ICategoriesService {
     boolean deleteCategories(Integer id);
     Categories findById(int id);
 
-   List<CategoriesDTO> getAllCategoriesWithParentChild();
+   List<CategoriesDTO> getAllCategoriesWithParentChild(Integer userID);
 
-   List<CategoriesDTO> getAllCategories();
+   List<CategoriesDTO> getAllCategories(Integer userID);
 }

@@ -7,6 +7,7 @@ import com.vti.entity.SpendingLimits;
 import com.vti.repository.ICategoriesRepository;
 import com.vti.repository.IMoneySourceRepository;
 import com.vti.repository.ISpendingLimitsRepository;
+import com.vti.repository.IUserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,11 @@ public class SpendingLimitsService implements ISpendingLimitsService {
     private final ISpendingLimitsRepository spendingLimitsRepository;
     private final ICategoriesRepository categoryRepository;
     private final IMoneySourceRepository moneySourceRepository;
+    private final IUserRepository userRepository;
 
     @Override
-    public List<SpendingLimitsDTO> getAll() {
-        return spendingLimitsRepository.findAll()
+    public List<SpendingLimitsDTO> getAll(int userId) {
+        return spendingLimitsRepository.findAllByUserId(userId)
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
@@ -55,6 +57,9 @@ public class SpendingLimitsService implements ISpendingLimitsService {
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy danh mục")));
         entity.setMoneySources(moneySourceRepository.findById(request.getMoneySourceId())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy nguồn tiền")));
+
+        entity.setUser(userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng")));
 
         spendingLimitsRepository.save(entity);
         return toDTO(entity);
@@ -86,8 +91,8 @@ public class SpendingLimitsService implements ISpendingLimitsService {
     }
 
     @Override
-    public SpendingLimits findByCategoriesIdAndMoneySourcesId(Integer categoriesId, Integer moneySourcesId) {
-        return spendingLimitsRepository.findByCategoriesIdAndMoneySourcesId(categoriesId, moneySourcesId);
+    public SpendingLimits findByCategoriesIdAndMoneySourcesIdAndUserId(Integer categoriesId, Integer moneySourcesId, Integer userId) {
+        return spendingLimitsRepository.findByCategoriesIdAndMoneySourcesIdAndUserId(categoriesId, moneySourcesId, userId);
     }
 
     @Override
@@ -113,7 +118,9 @@ public class SpendingLimitsService implements ISpendingLimitsService {
                 entity.getCategories().getId(),
                 entity.getCategories().getName(),
                 entity.getMoneySources().getId(),
-                entity.getMoneySources().getName()
+                entity.getMoneySources().getName(),
+                entity.getUser().getId(),
+                entity.getUser().getFullName()
         );
     }
 }

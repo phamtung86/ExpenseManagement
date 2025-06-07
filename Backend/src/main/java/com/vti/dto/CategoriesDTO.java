@@ -29,16 +29,19 @@ public class CategoriesDTO {
 
     private List<CategoriesDTO> children;
 
-    public CategoriesDTO(Integer id, String name, Integer parentId, String icon,
-                         String transactionTypesId, String transactionTypesName,
-                         List<CategoriesDTO> children) {
-        this.id = id;
-        this.name = name;
-        this.parentId = parentId;
-        this.icon = icon;
-        this.transactionTypesId = transactionTypesId;
-        this.transactionTypesName = transactionTypesName;
-        this.children = children;
-    }
+    private UserDTO user;
+
+//    public CategoriesDTO(Integer id, String name, Integer parentId, String icon,
+//                         String transactionTypesId, String transactionTypesName,
+//                         List<CategoriesDTO> children, List<TransactionsDTO> transactions) {
+//        this.id = id;
+//        this.name = name;
+//        this.parentId = parentId;
+//        this.icon = icon;
+//        this.transactionTypesId = transactionTypesId;
+//        this.transactionTypesName = transactionTypesName;
+//        this.children = children;
+//        this.transactions = transactions;
+//    }
 }
 

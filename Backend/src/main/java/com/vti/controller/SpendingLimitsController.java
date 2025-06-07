@@ -19,10 +19,10 @@ public class SpendingLimitsController {
     private final ISpendingLimitsService spendingLimitsService;
 
     // GET ALL
-    @GetMapping
-    public ResponseEntity<?> getAllSpendingLimits() {
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getAllSpendingLimits(@PathVariable int id) {
         try {
-            List<SpendingLimitsDTO> list = spendingLimitsService.getAll();
+            List<SpendingLimitsDTO> list = spendingLimitsService.getAll(id);
             return ResponseEntity.ok(list);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to fetch spending limits");

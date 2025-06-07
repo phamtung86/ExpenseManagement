@@ -29,6 +29,10 @@ public class Categories {
     @JsonBackReference // tránh loop khi serialize
     private TransactionTypes transactionTypes;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
     @OneToMany(mappedBy = "categories", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonBackReference // tránh loop khi serialize
     private List<Transactions> transactions;

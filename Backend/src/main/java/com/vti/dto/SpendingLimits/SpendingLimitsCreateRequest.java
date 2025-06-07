@@ -12,5 +12,7 @@ public class SpendingLimitsCreateRequest {
     private String note;
     private Integer categoryId;
     private Integer moneySourceId;
+
+    private Integer userId;
 }
 
