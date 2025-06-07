@@ -83,7 +83,7 @@ public class TransactionService implements ITransactionService {
         if (createTransactionForm.getTransactionTypeType().equals("INCOME")) {
             amount = createTransactionForm.getAmount();
         } else {
-            SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesId(createTransactionForm.getCategoriesId(), createTransactionForm.getMoneySourcesId());
+            SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(createTransactionForm.getCategoriesId(), createTransactionForm.getMoneySourcesId(), createTransactionForm.getUserId());
             if (spendingLimits != null) {
                 if (spendingLimits.isActive()) {
                     spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() + createTransactionForm.getAmount());
@@ -161,7 +161,8 @@ public class TransactionService implements ITransactionService {
 
     @Override
     public double getAllTotalExpensesByMoneySources(Integer moneySourceID) {
-        return transactionRepository.getAllTotalExpensesByMoneySources(moneySourceID);
+        LocalDate now = LocalDate.now();
+        return transactionRepository.getAllTotalExpensesByMoneySources(moneySourceID, now.getMonthValue());
     }
 
     @Override

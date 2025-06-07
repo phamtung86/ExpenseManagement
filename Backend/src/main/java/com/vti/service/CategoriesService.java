@@ -10,7 +10,6 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,7 +33,6 @@ public class CategoriesService implements ICategoriesService {
 //        categories.setIcon(create.getIcon());
         Categories categories = modelMapper.map(create, Categories.class);
         categories.setId(null);
-
         categoriesRepository.save(categories);
     }
 
@@ -66,8 +64,8 @@ public class CategoriesService implements ICategoriesService {
         return categoriesRepository.findById(id).orElse(null);
     }
 
-    public List<CategoriesDTO> getAllCategoriesWithParentChild() {
-        List<Categories> allCategories = categoriesRepository.findAll();
+    public List<CategoriesDTO> getAllCategoriesWithParentChild(Integer userID) {
+        List<Categories> allCategories = categoriesRepository.findAllCategoriesByUserId(userID);
 
         List<CategoriesDTO> root = allCategories.stream()
                 .filter(categories -> categories.getParentId() == null)
@@ -77,14 +75,14 @@ public class CategoriesService implements ICategoriesService {
             getChild(rootDTO, allCategories);
         }
 
-
         return root;
     }
 
     @Override
-    public List<CategoriesDTO> getAllCategories() {
-        List<Categories> allCategories = categoriesRepository.findAll();
-        List<CategoriesDTO> categoriesDTOS = modelMapper.map(allCategories, new TypeToken<List<CategoriesDTO>>() {}.getType());
+    public List<CategoriesDTO> getAllCategories(Integer userID) {
+        List<Categories> allCategories = categoriesRepository.findAllCategoriesByUserId(userID);
+        List<CategoriesDTO> categoriesDTOS = modelMapper.map(allCategories, new TypeToken<List<CategoriesDTO>>() {
+        }.getType());
         return categoriesDTOS;
     }
 
@@ -104,22 +102,24 @@ public class CategoriesService implements ICategoriesService {
         for (CategoriesDTO child : chils) {
             getChild(child, allCategories);
         }
-
-
         return chils;
     }
 
-    private CategoriesDTO convertToDto(Categories c) {
-        return new CategoriesDTO(
-                c.getId(),
-                c.getName(),
-                c.getParentId(),
-                c.getIcon(),
-                c.getTransactionTypes() != null ? String.valueOf(c.getTransactionTypes().getId()) : null,
-                c.getTransactionTypes() != null ? c.getTransactionTypes().getName() : null,
-                new ArrayList<>()
-
-        );
+//    private CategoriesDTO convertToDto(Categories c) {
+//        return new CategoriesDTO(
+//                c.getId(),
+//                c.getName(),
+//                c.getParentId(),
+//                c.getIcon(),
+//                c.getTransactionTypes() != null ? String.valueOf(c.getTransactionTypes().getId()) : null,
+//                c.getTransactionTypes() != null ? c.getTransactionTypes().getName() : null,
+//                new ArrayList<>(),
+//                c.getTransactions()
+//
+//        );
+//    }
+    public CategoriesDTO convertToDto(Categories category) {
+        return modelMapper.map(category, CategoriesDTO.class);
     }
 
 }

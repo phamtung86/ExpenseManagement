@@ -47,6 +47,10 @@ public class SpendingLimits {
     @JoinColumn(name = "money_source_id", referencedColumnName = "id")
     private MoneySources moneySources; //	Nguồn tiền được áp dụng cho hạn mức đó
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
     public enum PeriodType {
         DAILY, WEEKLY, MONTHLY, QUARTERLY, YEARLY;
     }

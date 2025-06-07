@@ -19,14 +19,14 @@ public class CategoriesController {
     @Autowired
     private ICategoriesService categoriesService;
 
-    @GetMapping
-    public ResponseEntity<List<CategoriesDTO>> getAllCategories() {
-        return new ResponseEntity<>(categoriesService.getAllCategories(), HttpStatus.OK);
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<CategoriesDTO>> getAllCategories(@PathVariable(name = "id") int userID) {
+        return new ResponseEntity<>(categoriesService.getAllCategories(userID), HttpStatus.OK);
     }
 
-    @GetMapping("/parent-child")
-    public List<CategoriesDTO> getAllCategoriesWithParentChild() {
-        return categoriesService.getAllCategoriesWithParentChild();
+    @GetMapping("/parent-child/user/{id}")
+    public List<CategoriesDTO> getAllCategoriesWithParentChild(@PathVariable(name = "id") int userID) {
+        return categoriesService.getAllCategoriesWithParentChild(userID);
     }
 
     @PostMapping

@@ -8,7 +8,7 @@ import com.vti.entity.SpendingLimits;
 import java.util.List;
 
 public interface ISpendingLimitsService {
-    List<SpendingLimitsDTO> getAll();
+    List<SpendingLimitsDTO> getAll(int userId);
 
     SpendingLimitsDTO getById(Integer id);
 
@@ -18,7 +18,7 @@ public interface ISpendingLimitsService {
 
     void delete(Integer id);
 
-    SpendingLimits findByCategoriesIdAndMoneySourcesId(Integer categoriesId, Integer moneySourcesId);
+    SpendingLimits findByCategoriesIdAndMoneySourcesIdAndUserId(Integer categoriesId, Integer moneySourcesId, Integer userId);
 
     void updateActualSpent(Integer id, Double actualSpent);
 }

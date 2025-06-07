@@ -58,6 +58,7 @@ public class MoneySourceService implements IMoneySourceService {
         }
 
         double totalExpenses = transactionService.getAllTotalExpensesByMoneySources(id);
+        System.out.println(totalExpenses);
 
         MoneySources updatedMoneySource = modelMapper.map(updateMoneySourceForm, MoneySources.class);
 
@@ -68,10 +69,10 @@ public class MoneySourceService implements IMoneySourceService {
         updatedMoneySource.setId(id);
         updatedMoneySource.setCreatedAt(existingMoneySource.getCreatedAt());
         updatedMoneySource.setUser(existingMoneySource.getUser());
-        updatedMoneySource.setActive(true);
+        updatedMoneySource.setActive(updateMoneySourceForm.isActive());
         updatedMoneySource.setUpdateAt(new Date());
 
-        moneySourceRepository.save(updatedMoneySource);
+//        moneySourceRepository.save(updatedMoneySource);
         return true;
     }
 

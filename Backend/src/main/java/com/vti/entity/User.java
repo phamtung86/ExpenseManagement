@@ -42,4 +42,10 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<MoneySources> moneySources;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Categories> categories;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<SpendingLimits> spendingLimits;
 }
