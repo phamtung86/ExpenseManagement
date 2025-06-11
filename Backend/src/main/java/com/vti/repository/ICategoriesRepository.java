@@ -14,4 +14,8 @@ public interface ICategoriesRepository extends JpaRepository<Categories, Integer
     @Query("SELECT c FROM categories c WHERE c.user IS NULL OR c.user.id = :userID")
     List<Categories> findAllCategoriesByUserId(@Param("userID") Integer userId);
 
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM categories c WHERE c.id = :id AND c.parentId IS NULL")
+    boolean isParentCategories(@Param("id") Integer id);
+
+
 }

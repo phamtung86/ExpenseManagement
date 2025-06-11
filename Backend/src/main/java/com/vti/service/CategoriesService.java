@@ -86,6 +86,11 @@ public class CategoriesService implements ICategoriesService {
         return categoriesDTOS;
     }
 
+    @Override
+    public boolean isParentCategories(Integer id) {
+        return categoriesRepository.isParentCategories(id);
+    }
+
     private List<CategoriesDTO> getChild(CategoriesDTO root, List<Categories> allCategories) {
 //        List<Categories> categoriesCopy = allCategories.c
         List<CategoriesDTO> chils = allCategories.stream()
