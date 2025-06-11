@@ -16,4 +16,6 @@ public class UpdateTransactionForm {
     private double amount;
 
     private Date transactionDate;
+
+    private Integer userId;
 }

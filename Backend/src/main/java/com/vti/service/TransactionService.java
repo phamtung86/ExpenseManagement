@@ -79,14 +79,29 @@ public class TransactionService implements ITransactionService {
     public Transactions createTransaction(CreateTransactionForm createTransactionForm) {
         Transactions transactions = modelMapper.map(createTransactionForm, Transactions.class);
         transactions.setAction(Transactions.Action.CREATED);
-        double amount = 0;
-        if (createTransactionForm.getTransactionTypeType().equals("INCOME")) {
+
+        double amount;
+
+        if ("INCOME".equals(createTransactionForm.getTransactionTypeType())) {
             amount = createTransactionForm.getAmount();
         } else {
-            SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(createTransactionForm.getCategoriesId(), createTransactionForm.getMoneySourcesId(), createTransactionForm.getUserId());
-            if (spendingLimits != null) {
-                if (spendingLimits.isActive()) {
-                    spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() + createTransactionForm.getAmount());
+            Categories category = categoriesService.findById(createTransactionForm.getCategoriesId());
+            if (categoriesService.isParentCategories(createTransactionForm.getCategoriesId())) {
+                SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(category.getId(), createTransactionForm.getMoneySourcesId(), createTransactionForm.getUserId());
+                if (spendingLimits != null && spendingLimits.isActive()) {
+                    double newActual = spendingLimits.getActualSpent() + createTransactionForm.getAmount();
+                    spendingLimitsService.updateActualSpent(spendingLimits.getId(), newActual);
+                }
+            } else {
+                SpendingLimits spl = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(category.getParentId(), createTransactionForm.getMoneySourcesId(), createTransactionForm.getUserId());
+                if (spl != null && spl.isActive()) {
+                    double newActual = spl.getActualSpent() + createTransactionForm.getAmount();
+                    spendingLimitsService.updateActualSpent(spl.getId(), newActual);
+                }
+                SpendingLimits childLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(category.getId(), createTransactionForm.getMoneySourcesId(), createTransactionForm.getUserId());
+                if (childLimits != null && childLimits.isActive()) {
+                    double childActual = childLimits.getActualSpent() + createTransactionForm.getAmount();
+                    childLimits.setActualSpent(childActual);
                 }
             }
             amount = -createTransactionForm.getAmount();
@@ -95,12 +110,14 @@ public class TransactionService implements ITransactionService {
         return transactionRepository.save(transactions);
     }
 
+
     @Transactional
     @Override
     public boolean updateTransaction(Integer transactionID, UpdateTransactionForm updateTransactionForm) {
         Categories categories;
         MoneySources moneySources;
         Transactions transaction = transactionRepository.findById(transactionID).orElse(null);
+
 
         if (transaction == null) {
             return false;
@@ -121,18 +138,54 @@ public class TransactionService implements ITransactionService {
         transaction.setUpdateAt(new Date());
         if (updateTransactionForm.getAmount() != transaction.getAmount()) {
             transaction.setAmount(updateTransactionForm.getAmount());
-            moneySourceService.updateCurrentBalance(updateTransactionForm.getMoneySourcesId(), oldAmount - updateTransactionForm.getAmount());
+            double amountUpdate = oldAmount - updateTransactionForm.getAmount();
+            moneySourceService.updateCurrentBalance(updateTransactionForm.getMoneySourcesId(), amountUpdate);
             transaction.setAmount(updateTransactionForm.getAmount());
+            Categories c = categoriesService.findById(updateTransactionForm.getCategoriesId());
+            if (categoriesService.isParentCategories(updateTransactionForm.getCategoriesId())) {
+                SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(c.getId(), updateTransactionForm.getMoneySourcesId(), updateTransactionForm.getUserId());
+                if (spendingLimits != null) {
+                    if (spendingLimits.isActive()) {
+                        spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() + amountUpdate);
+                    }
+                }
+            } else {
+                SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(c.getParentId(), updateTransactionForm.getMoneySourcesId(), updateTransactionForm.getUserId());
+                if (spendingLimits != null) {
+                    if (spendingLimits.isActive()) {
+                        spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() + amountUpdate);
+                    }
+                }
+
+                SpendingLimits childLimit = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(c.getId(), updateTransactionForm.getMoneySourcesId(), updateTransactionForm.getUserId());
+                if (childLimit != null) {
+                    if (childLimit.isActive()) {
+                        childLimit.setActualSpent(childLimit.getActualSpent() + amountUpdate);
+                    }
+                }
+            }
+
         }
         transaction.setAction(Transactions.Action.UPDATED);
         transactionRepository.save(transaction);
         return true;
     }
 
+    @Transactional
     @Override
     public boolean deleteTransaction(List<Integer> transactionID) {
         int count = 0;
         for (Integer i : transactionID) {
+            Transactions transaction = transactionRepository.findById(i).orElse(null);
+            assert transaction != null;
+            MoneySources moneySources = moneySourceService.findById(transaction.getMoneySources().getId());
+            moneySourceService.updateCurrentBalance(transaction.getMoneySources().getId(), transaction.getAmount());
+            SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(transaction.getCategories().getId(), transaction.getMoneySources().getId(), transaction.getUser().getId());
+            if (spendingLimits != null) {
+                if (spendingLimits.isActive()) {
+                    spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() - transaction.getAmount());
+                }
+            }
             transactionRepository.deleteById(i);
             count++;
         }
@@ -199,7 +252,8 @@ public class TransactionService implements ITransactionService {
     @Override
     public List<TransactionsDTO> getRecentTransactions(Integer userID, int limit) {
         List<Transactions> transactions = transactionRepository.findRecentTransactionsByUserId(userID, limit);
-        return modelMapper.map(transactions, new TypeToken<List<TransactionsDTO>>() {}.getType());
+        return modelMapper.map(transactions, new TypeToken<List<TransactionsDTO>>() {
+        }.getType());
     }
 
 }
