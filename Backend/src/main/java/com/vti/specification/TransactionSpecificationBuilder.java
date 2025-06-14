@@ -14,9 +14,11 @@ public class TransactionSpecificationBuilder {
 
     public Specification<Transactions> build() {
         Specification<Transactions> where = Specification.where(null);
-
+        if (filter.getUserId() != null) {
+            where = where.and(new TransactionSpecification(new SearchCriteria("user.id", "=", filter.getUserId())));
+        }
         if (filter.getTransactionTypesName() != null && !filter.getTransactionTypesName().isBlank()) {
-            where = where.and(new TransactionSpecification(new SearchCriteria("transactionTypes.name", "=", filter.getTransactionTypesName())));
+            where = where.and(new TransactionSpecification(new SearchCriteria("transactionTypes.type", "=", filter.getTransactionTypesName())));
         }
 
         if (filter.getCategoriesName() != null && !filter.getCategoriesName().isBlank()) {

@@ -1,10 +1,16 @@
 package com.vti.dto.filter;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
+@Getter
+@Setter
 public class TransactionFilter {
+
+    private Integer userId;
 
     // Tên loại giao dịch (TransactionTypes.name)
     private String transactionTypesName;
@@ -27,40 +33,20 @@ public class TransactionFilter {
 
     // Getters & Setters
 
-    public String getTransactionTypesName() {
-        return transactionTypesName;
-    }
-
     public void setTransactionTypesName(String transactionTypesName) {
         this.transactionTypesName = transactionTypesName;
-    }
-
-    public String getCategoriesName() {
-        return categoriesName;
     }
 
     public void setCategoriesName(String categoriesName) {
         this.categoriesName = categoriesName;
     }
 
-    public String getMoneySourceName() {
-        return moneySourceName;
-    }
-
     public void setMoneySourceName(String moneySourceName) {
         this.moneySourceName = moneySourceName;
     }
 
-    public Date getFromDate() {
-        return fromDate;
-    }
-
     public void setFromDate(Date fromDate) {
         this.fromDate = fromDate;
-    }
-
-    public Date getToDate() {
-        return toDate;
     }
 
     public void setToDate(Date toDate) {
