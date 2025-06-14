@@ -5,6 +5,7 @@ import com.vti.entity.Categories;
 import com.vti.form.CreateCategories;
 import com.vti.form.UpdateCategories;
 import com.vti.repository.ICategoriesRepository;
+import org.hibernate.Transaction;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,13 @@ public class CategoriesService implements ICategoriesService {
     @Override
     public boolean isParentCategories(Integer id) {
         return categoriesRepository.isParentCategories(id);
+    }
+
+    @Override
+    public List<CategoriesDTO> getAllCategoriesByTransactionType(Integer transactionTypeId,Integer userID) {
+        List<Categories> categories = categoriesRepository.findAllCategoriesByUserIdAndTransactionTypesId(transactionTypeId, userID);
+
+        return modelMapper.map(categories, new TypeToken<List<CategoriesDTO>>(){}.getType());
     }
 
     private List<CategoriesDTO> getChild(CategoriesDTO root, List<Categories> allCategories) {

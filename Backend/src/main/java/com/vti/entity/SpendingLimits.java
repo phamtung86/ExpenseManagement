@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +25,10 @@ public class SpendingLimits {
     private PeriodType periodType; //Kỳ hạn của giới hạn: ngày / tuần / tháng / quý / năm (DAILY,...)
 
     @Column(name = "start_date")
-    private Date startDate; //Ngày bắt đầu áp dụng hạn mức
+    private LocalDate startDate; //Ngày bắt đầu áp dụng hạn mức
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @Column(name = "actual_spent")
     private Double actualSpent; //	Số tiền thực tế đã chi trong kỳ hạn đó

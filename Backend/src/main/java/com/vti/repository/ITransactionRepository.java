@@ -53,7 +53,7 @@ public interface ITransactionRepository extends JpaRepository<Transactions, Inte
                                  @Param("userId") int userId);
 
 
-    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId ORDER BY t.transactionDate DESC LIMIT :limit")
+    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId ORDER BY t.id DESC LIMIT :limit")
     List<Transactions> findRecentTransactionsByUserId(@Param("userId") Integer userId, @Param("limit") int limit);
 
 }
