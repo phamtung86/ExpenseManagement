@@ -4,7 +4,6 @@ import com.vti.dto.TransactionsDTO;
 import com.vti.dto.UserDTO;
 import com.vti.dto.filter.TransactionFilter;
 import com.vti.entity.Categories;
-import com.vti.entity.MoneySources;
 import com.vti.entity.SpendingLimits;
 import com.vti.entity.Transactions;
 import com.vti.form.CreateTransactionForm;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -44,15 +42,12 @@ public class TransactionService implements ITransactionService {
     @Autowired
     private ISpendingLimitsService spendingLimitsService;
 
-//    Page<Transactions> transactions = transactionRepository.findAllByUserId(pageable, userID);
-//    List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactions.getContent(), new TypeToken<List<TransactionsDTO>>() {}.getType());
-//        return new PageImpl<>(transactionsDTOS, pageable, transactions.getTotalElements());
-
-    public Page<TransactionsDTO> filterTransactions(TransactionFilter filter , Integer userId, Pageable pageable) {
+    public Page<TransactionsDTO> filterTransactions(TransactionFilter filter, Integer userId, Pageable pageable) {
         filter.setUserId(userId);
         TransactionSpecificationBuilder builder = new TransactionSpecificationBuilder(filter);
         Page<Transactions> transactionsPage = transactionRepository.findAll(builder.build(), pageable);
-        List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactionsPage.getContent(), new TypeToken<List<TransactionsDTO>>() {}.getType());
+        List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactionsPage.getContent(), new TypeToken<List<TransactionsDTO>>() {
+        }.getType());
         return new PageImpl<>(transactionsDTOS, pageable, transactionsPage.getTotalElements());
     }
 
@@ -64,7 +59,7 @@ public class TransactionService implements ITransactionService {
                 entity.getTransactionDate(),
                 entity.getUpdateAt(),
                 entity.getDescription(),
-                new UserDTO(null, entity.getUser ().getFullName(), null, null, null, null),
+                new UserDTO(null, entity.getUser().getFullName(), null, null, null, null),
                 entity.getCategories().getId(),
                 entity.getCategories().getName(),
                 entity.getTransactionTypes().getId().toString(),
@@ -214,7 +209,7 @@ public class TransactionService implements ITransactionService {
 
     private void updateSpendingLimitsOnDelete(Transactions transaction) {
         SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
-                transaction.getCategories().getId(), transaction.getMoneySources().getId(), transaction.getUser ().getId());
+                transaction.getCategories().getId(), transaction.getMoneySources().getId(), transaction.getUser().getId());
         if (spendingLimits != null && spendingLimits.isActive()) {
             spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() - transaction.getAmount());
         }
@@ -233,7 +228,8 @@ public class TransactionService implements ITransactionService {
     @Override
     public Page<TransactionsDTO> getTransactions(Pageable pageable, Integer userID) {
         Page<Transactions> transactions = transactionRepository.findAllByUserId(pageable, userID);
-        List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactions.getContent(), new TypeToken<List<TransactionsDTO>>() {}.getType());
+        List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactions.getContent(), new TypeToken<List<TransactionsDTO>>() {
+        }.getType());
         return new PageImpl<>(transactionsDTOS, pageable, transactions.getTotalElements());
     }
 
@@ -276,6 +272,7 @@ public class TransactionService implements ITransactionService {
     @Override
     public List<TransactionsDTO> getRecentTransactions(Integer userID, int limit) {
         List<Transactions> transactions = transactionRepository.findRecentTransactionsByUserId(userID, limit);
-        return modelMapper.map(transactions, new TypeToken<List<TransactionsDTO>>() {}.getType());
+        return modelMapper.map(transactions, new TypeToken<List<TransactionsDTO>>() {
+        }.getType());
     }
 }

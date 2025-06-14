@@ -8,11 +8,15 @@ import com.vti.repository.ICategoriesRepository;
 import com.vti.repository.IMoneySourceRepository;
 import com.vti.repository.ISpendingLimitsRepository;
 import com.vti.repository.IUserRepository;
+import com.vti.utils.CycleUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,11 +52,12 @@ public class SpendingLimitsService implements ISpendingLimitsService {
         entity.setPeriodType(SpendingLimits.PeriodType.valueOf(request.getPeriodType().toUpperCase()));
         entity.setStartDate(request.getStartDate());
         entity.setNote(request.getNote());
+        SpendingLimits.PeriodType p = SpendingLimits.PeriodType.valueOf(request.getPeriodType());
+        entity.setEndDate(CycleUtil.calculateEndDate(request.getStartDate(), p));
         entity.setCreatedAt(new Date());
         entity.setUpdateAt(new Date());
         entity.setActualSpent(0.0);
-        entity.setActive(true);
-
+        entity.setActive(!request.getStartDate().isAfter(LocalDate.now()));
         entity.setCategories(categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy danh mục")));
         entity.setMoneySources(moneySourceRepository.findById(request.getMoneySourceId())
@@ -113,6 +118,7 @@ public class SpendingLimitsService implements ISpendingLimitsService {
                 entity.getActualSpent(),
                 entity.getNote(),
                 entity.isActive(),
+                entity.getEndDate(),
                 entity.getCreatedAt(),
                 entity.getUpdateAt(),
                 entity.getCategories().getId(),
@@ -123,4 +129,5 @@ public class SpendingLimitsService implements ISpendingLimitsService {
                 entity.getUser().getFullName()
         );
     }
+
 }

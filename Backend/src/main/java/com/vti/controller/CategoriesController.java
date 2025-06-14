@@ -24,6 +24,11 @@ public class CategoriesController {
         return new ResponseEntity<>(categoriesService.getAllCategories(userID), HttpStatus.OK);
     }
 
+    @GetMapping("/user/{id}/transaction-type/{transactionTypeId}")
+    public ResponseEntity<List<CategoriesDTO>> getAllCategoriesByTransactionTypeId(@PathVariable(name = "transactionTypeId") Integer transactionTypeId,@PathVariable(name = "id") int userID) {
+        return new ResponseEntity<>(categoriesService.getAllCategoriesByTransactionType(transactionTypeId,userID), HttpStatus.OK);
+    }
+
     @GetMapping("/parent-child/user/{id}")
     public List<CategoriesDTO> getAllCategoriesWithParentChild(@PathVariable(name = "id") int userID) {
         return categoriesService.getAllCategoriesWithParentChild(userID);

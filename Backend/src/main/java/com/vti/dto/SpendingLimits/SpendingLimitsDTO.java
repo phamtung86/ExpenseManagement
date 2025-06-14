@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -19,13 +20,15 @@ public class SpendingLimitsDTO {
 
     private String periodType;
 
-    private Date startDate;
+    private LocalDate startDate;
 
     private Double actualSpent;
 
     private String note;
 
     private boolean isActive;
+
+    private LocalDate endDate;
 
     private Date createdAt;
     private Date updateAt;

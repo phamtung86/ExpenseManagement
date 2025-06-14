@@ -19,4 +19,6 @@ public interface ICategoriesService {
    List<CategoriesDTO> getAllCategories(Integer userID);
 
     boolean isParentCategories(Integer id);
+
+    List<CategoriesDTO> getAllCategoriesByTransactionType(Integer transactionTypeId,Integer userID);
 }
