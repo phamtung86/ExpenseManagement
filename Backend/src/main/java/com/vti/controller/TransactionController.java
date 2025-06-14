@@ -34,9 +34,9 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getTransactions(pageable, userId));
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<List<TransactionsDTO>> getFilteredTransactions(@ModelAttribute TransactionFilter filter) {
-        return ResponseEntity.ok(transactionService.filterTransactions(filter));
+    @GetMapping("/filter/user/{id}")
+    public ResponseEntity<Page<TransactionsDTO>> getFilteredTransactions(@ModelAttribute TransactionFilter filter, @PathVariable(name = "id") Integer userId, Pageable pageable) {
+        return ResponseEntity.ok(transactionService.filterTransactions(filter, userId, pageable));
     }
 
     @PostMapping

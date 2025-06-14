@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,15 +44,16 @@ public class TransactionService implements ITransactionService {
     @Autowired
     private ISpendingLimitsService spendingLimitsService;
 
-    public List<TransactionsDTO> filterTransactions(TransactionFilter filter) {
+//    Page<Transactions> transactions = transactionRepository.findAllByUserId(pageable, userID);
+//    List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactions.getContent(), new TypeToken<List<TransactionsDTO>>() {}.getType());
+//        return new PageImpl<>(transactionsDTOS, pageable, transactions.getTotalElements());
+
+    public Page<TransactionsDTO> filterTransactions(TransactionFilter filter , Integer userId, Pageable pageable) {
+        filter.setUserId(userId);
         TransactionSpecificationBuilder builder = new TransactionSpecificationBuilder(filter);
-
-        List<Transactions> entities = transactionRepository.findAll(builder.build());
-
-        // Map từ entity sang DTO
-        return entities.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+        Page<Transactions> transactionsPage = transactionRepository.findAll(builder.build(), pageable);
+        List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactionsPage.getContent(), new TypeToken<List<TransactionsDTO>>() {}.getType());
+        return new PageImpl<>(transactionsDTOS, pageable, transactionsPage.getTotalElements());
     }
 
     private TransactionsDTO toDTO(Transactions entity) {
@@ -62,8 +64,7 @@ public class TransactionService implements ITransactionService {
                 entity.getTransactionDate(),
                 entity.getUpdateAt(),
                 entity.getDescription(),
-                new UserDTO(null, entity.getUser().getFullName(), null, null, null, null)
-                ,
+                new UserDTO(null, entity.getUser ().getFullName(), null, null, null, null),
                 entity.getCategories().getId(),
                 entity.getCategories().getName(),
                 entity.getTransactionTypes().getId().toString(),
@@ -77,139 +78,163 @@ public class TransactionService implements ITransactionService {
     @Transactional
     @Override
     public Transactions createTransaction(CreateTransactionForm createTransactionForm) {
-        Transactions transactions = modelMapper.map(createTransactionForm, Transactions.class);
-        transactions.setAction(Transactions.Action.CREATED);
-
-        double amount;
-
-        if ("INCOME".equals(createTransactionForm.getTransactionTypeType())) {
-            amount = createTransactionForm.getAmount();
-        } else {
-            Categories category = categoriesService.findById(createTransactionForm.getCategoriesId());
-            if (categoriesService.isParentCategories(createTransactionForm.getCategoriesId())) {
-                SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(category.getId(), createTransactionForm.getMoneySourcesId(), createTransactionForm.getUserId());
-                if (spendingLimits != null && spendingLimits.isActive()) {
-                    double newActual = spendingLimits.getActualSpent() + createTransactionForm.getAmount();
-                    spendingLimitsService.updateActualSpent(spendingLimits.getId(), newActual);
-                }
-            } else {
-                SpendingLimits spl = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(category.getParentId(), createTransactionForm.getMoneySourcesId(), createTransactionForm.getUserId());
-                if (spl != null && spl.isActive()) {
-                    double newActual = spl.getActualSpent() + createTransactionForm.getAmount();
-                    spendingLimitsService.updateActualSpent(spl.getId(), newActual);
-                }
-                SpendingLimits childLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(category.getId(), createTransactionForm.getMoneySourcesId(), createTransactionForm.getUserId());
-                if (childLimits != null && childLimits.isActive()) {
-                    double childActual = childLimits.getActualSpent() + createTransactionForm.getAmount();
-                    childLimits.setActualSpent(childActual);
-                }
-            }
-            amount = -createTransactionForm.getAmount();
-        }
+        Transactions transaction = modelMapper.map(createTransactionForm, Transactions.class);
+        transaction.setAction(Transactions.Action.CREATED);
+        double amount = calculateTransactionAmount(createTransactionForm);
         moneySourceService.updateCurrentBalance(createTransactionForm.getMoneySourcesId(), amount);
-        return transactionRepository.save(transactions);
+        return transactionRepository.save(transaction);
     }
 
+    private double calculateTransactionAmount(CreateTransactionForm form) {
+        if ("INCOME".equals(form.getTransactionTypeType())) {
+            return form.getAmount();
+        } else {
+            updateSpendingLimits(form);
+            return -form.getAmount();
+        }
+    }
+
+    private void updateSpendingLimits(CreateTransactionForm form) {
+        Categories category = categoriesService.findById(form.getCategoriesId());
+        if (categoriesService.isParentCategories(form.getCategoriesId())) {
+            updateSpendingLimitForParentCategory(form, category);
+        } else {
+            updateSpendingLimitForChildCategory(form, category);
+        }
+    }
+
+    private void updateSpendingLimitForParentCategory(CreateTransactionForm form, Categories category) {
+        SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
+                category.getId(), form.getMoneySourcesId(), form.getUserId());
+        if (spendingLimits != null && spendingLimits.isActive()) {
+            double newActual = spendingLimits.getActualSpent() + form.getAmount();
+            spendingLimitsService.updateActualSpent(spendingLimits.getId(), newActual);
+        }
+    }
+
+    private void updateSpendingLimitForChildCategory(CreateTransactionForm form, Categories category) {
+        SpendingLimits parentLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
+                category.getParentId(), form.getMoneySourcesId(), form.getUserId());
+        if (parentLimits != null && parentLimits.isActive()) {
+            double newActual = parentLimits.getActualSpent() + form.getAmount();
+            spendingLimitsService.updateActualSpent(parentLimits.getId(), newActual);
+        }
+        SpendingLimits childLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
+                category.getId(), form.getMoneySourcesId(), form.getUserId());
+        if (childLimits != null && childLimits.isActive()) {
+            double childActual = childLimits.getActualSpent() + form.getAmount();
+            childLimits.setActualSpent(childActual);
+        }
+    }
 
     @Transactional
     @Override
     public boolean updateTransaction(Integer transactionID, UpdateTransactionForm updateTransactionForm) {
-        Categories categories;
-        MoneySources moneySources;
         Transactions transaction = transactionRepository.findById(transactionID).orElse(null);
-
-
         if (transaction == null) {
             return false;
         }
-        if (!transaction.getCategories().getId().equals(updateTransactionForm.getCategoriesId())) {
-            categories = categoriesService.findById(updateTransactionForm.getCategoriesId());
-            transaction.setCategories(categories);
-        }
-        if (!transaction.getMoneySources().getId().equals(updateTransactionForm.getMoneySourcesId())) {
-            moneySources = moneySourceService.findById(updateTransactionForm.getMoneySourcesId());
-            transaction.setMoneySources(moneySources);
-        }
-        Double oldAmount = transaction.getAmount();
-        transaction.setDescription(updateTransactionForm.getDescription());
-        if (!transaction.getTransactionDate().equals(updateTransactionForm.getTransactionDate())) {
-            transaction.setTransactionDate(updateTransactionForm.getTransactionDate());
-        }
-        transaction.setUpdateAt(new Date());
-        if (updateTransactionForm.getAmount() != transaction.getAmount()) {
-            transaction.setAmount(updateTransactionForm.getAmount());
-            double amountUpdate = oldAmount - updateTransactionForm.getAmount();
-            moneySourceService.updateCurrentBalance(updateTransactionForm.getMoneySourcesId(), amountUpdate);
-            transaction.setAmount(updateTransactionForm.getAmount());
-            Categories c = categoriesService.findById(updateTransactionForm.getCategoriesId());
-            if (categoriesService.isParentCategories(updateTransactionForm.getCategoriesId())) {
-                SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(c.getId(), updateTransactionForm.getMoneySourcesId(), updateTransactionForm.getUserId());
-                if (spendingLimits != null) {
-                    if (spendingLimits.isActive()) {
-                        spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() + amountUpdate);
-                    }
-                }
-            } else {
-                SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(c.getParentId(), updateTransactionForm.getMoneySourcesId(), updateTransactionForm.getUserId());
-                if (spendingLimits != null) {
-                    if (spendingLimits.isActive()) {
-                        spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() + amountUpdate);
-                    }
-                }
-
-                SpendingLimits childLimit = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(c.getId(), updateTransactionForm.getMoneySourcesId(), updateTransactionForm.getUserId());
-                if (childLimit != null) {
-                    if (childLimit.isActive()) {
-                        childLimit.setActualSpent(childLimit.getActualSpent() + amountUpdate);
-                    }
-                }
-            }
-
-        }
+        updateTransactionDetails(transaction, updateTransactionForm);
         transaction.setAction(Transactions.Action.UPDATED);
         transactionRepository.save(transaction);
         return true;
     }
 
+    private void updateTransactionDetails(Transactions transaction, UpdateTransactionForm form) {
+        if (!transaction.getCategories().getId().equals(form.getCategoriesId())) {
+            transaction.setCategories(categoriesService.findById(form.getCategoriesId()));
+        }
+        if (!transaction.getMoneySources().getId().equals(form.getMoneySourcesId())) {
+            transaction.setMoneySources(moneySourceService.findById(form.getMoneySourcesId()));
+        }
+        transaction.setDescription(form.getDescription());
+        if (!transaction.getTransactionDate().equals(form.getTransactionDate())) {
+            transaction.setTransactionDate(form.getTransactionDate());
+        }
+        transaction.setUpdateAt(new Date());
+        updateTransactionAmount(transaction, form);
+    }
+
+    private void updateTransactionAmount(Transactions transaction, UpdateTransactionForm form) {
+        double oldAmount = transaction.getAmount();
+        if (form.getAmount() != oldAmount) {
+            transaction.setAmount(form.getAmount());
+            double amountUpdate = oldAmount - form.getAmount();
+            moneySourceService.updateCurrentBalance(form.getMoneySourcesId(), amountUpdate);
+            updateSpendingLimitsOnUpdate(form, amountUpdate);
+        }
+    }
+
+    private void updateSpendingLimitsOnUpdate(UpdateTransactionForm form, double amountUpdate) {
+        Categories category = categoriesService.findById(form.getCategoriesId());
+        if (categoriesService.isParentCategories(form.getCategoriesId())) {
+            updateSpendingLimitForParentCategoryOnUpdate(form, category, amountUpdate);
+        } else {
+            updateSpendingLimitForChildCategoryOnUpdate(form, category, amountUpdate);
+        }
+    }
+
+    private void updateSpendingLimitForParentCategoryOnUpdate(UpdateTransactionForm form, Categories category, double amountUpdate) {
+        SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
+                category.getId(), form.getMoneySourcesId(), form.getUserId());
+        if (spendingLimits != null && spendingLimits.isActive()) {
+            spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() + amountUpdate);
+        }
+    }
+
+    private void updateSpendingLimitForChildCategoryOnUpdate(UpdateTransactionForm form, Categories category, double amountUpdate) {
+        SpendingLimits parentLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
+                category.getParentId(), form.getMoneySourcesId(), form.getUserId());
+        if (parentLimits != null && parentLimits.isActive()) {
+            spendingLimitsService.updateActualSpent(parentLimits.getId(), parentLimits.getActualSpent() + amountUpdate);
+        }
+        SpendingLimits childLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
+                category.getId(), form.getMoneySourcesId(), form.getUserId());
+        if (childLimits != null && childLimits.isActive()) {
+            childLimits.setActualSpent(childLimits.getActualSpent() + amountUpdate);
+        }
+    }
+
     @Transactional
     @Override
-    public boolean deleteTransaction(List<Integer> transactionID) {
+    public boolean deleteTransaction(List<Integer> transactionIDs) {
         int count = 0;
-        for (Integer i : transactionID) {
-            Transactions transaction = transactionRepository.findById(i).orElse(null);
-            assert transaction != null;
-            MoneySources moneySources = moneySourceService.findById(transaction.getMoneySources().getId());
-            moneySourceService.updateCurrentBalance(transaction.getMoneySources().getId(), transaction.getAmount());
-            SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(transaction.getCategories().getId(), transaction.getMoneySources().getId(), transaction.getUser().getId());
-            if (spendingLimits != null) {
-                if (spendingLimits.isActive()) {
-                    spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() - transaction.getAmount());
-                }
+        for (Integer id : transactionIDs) {
+            Optional<Transactions> transactionOpt = transactionRepository.findById(id);
+            if (transactionOpt.isPresent()) {
+                Transactions transaction = transactionOpt.get();
+                moneySourceService.updateCurrentBalance(transaction.getMoneySources().getId(), transaction.getAmount());
+                updateSpendingLimitsOnDelete(transaction);
+                transactionRepository.deleteById(id);
+                count++;
             }
-            transactionRepository.deleteById(i);
-            count++;
         }
-
         return count > 0;
+    }
+
+    private void updateSpendingLimitsOnDelete(Transactions transaction) {
+        SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
+                transaction.getCategories().getId(), transaction.getMoneySources().getId(), transaction.getUser ().getId());
+        if (spendingLimits != null && spendingLimits.isActive()) {
+            spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() - transaction.getAmount());
+        }
+    }
+
+    private void updateSpendingLimitsForParentCategoryOnUpdate(Transactions transactions) {
+
     }
 
     @Override
     public List<TransactionsDTO> getAllTransactions(Integer userID) {
         List<Transactions> transactions = transactionRepository.findAllByUserId(userID);
-        List<TransactionsDTO> transactionsDTOS = new ArrayList<>();
-        for (Transactions transaction : transactions) {
-            transactionsDTOS.add(toDTO(transaction));
-        }
-        return transactionsDTOS;
+        return transactions.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Override
     public Page<TransactionsDTO> getTransactions(Pageable pageable, Integer userID) {
         Page<Transactions> transactions = transactionRepository.findAllByUserId(pageable, userID);
-        List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactions.getContent(), new TypeToken<List<TransactionsDTO>>() {
-        }.getType());
-        Page<TransactionsDTO> transactionsDTOPage = new PageImpl<>(transactionsDTOS, pageable, transactions.getTotalElements());
-        return transactionsDTOPage;
+        List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactions.getContent(), new TypeToken<List<TransactionsDTO>>() {}.getType());
+        return new PageImpl<>(transactionsDTOS, pageable, transactions.getTotalElements());
     }
 
     @Override
@@ -229,9 +254,8 @@ public class TransactionService implements ITransactionService {
             case "YEAR":
                 return transactionRepository.getTotalExpenseByYear(now.getYear(), userId);
             default:
-                throw new IllegalArgumentException("Type phải là: DAY, MONTH, hoặc YEAR");
+                throw new IllegalArgumentException("Type must be: DAY, MONTH, or YEAR");
         }
-
     }
 
     @Override
@@ -245,15 +269,13 @@ public class TransactionService implements ITransactionService {
             case "YEAR":
                 return transactionRepository.getTotalIncomeByYear(now.getYear(), userId);
             default:
-                throw new IllegalArgumentException("Type phải là: DAY, MONTH, hoặc YEAR");
+                throw new IllegalArgumentException("Type must be: DAY, MONTH, or YEAR");
         }
     }
 
     @Override
     public List<TransactionsDTO> getRecentTransactions(Integer userID, int limit) {
         List<Transactions> transactions = transactionRepository.findRecentTransactionsByUserId(userID, limit);
-        return modelMapper.map(transactions, new TypeToken<List<TransactionsDTO>>() {
-        }.getType());
+        return modelMapper.map(transactions, new TypeToken<List<TransactionsDTO>>() {}.getType());
     }
-
 }
