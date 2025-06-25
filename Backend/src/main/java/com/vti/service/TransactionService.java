@@ -8,6 +8,7 @@ import com.vti.entity.SpendingLimits;
 import com.vti.entity.Transactions;
 import com.vti.form.CreateTransactionForm;
 import com.vti.form.UpdateTransactionForm;
+import com.vti.models.ReportModel;
 import com.vti.repository.ITransactionRepository;
 import com.vti.specification.TransactionSpecificationBuilder;
 import org.modelmapper.ModelMapper;
@@ -21,9 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -136,28 +135,66 @@ public class TransactionService implements ITransactionService {
     }
 
     private void updateTransactionDetails(Transactions transaction, UpdateTransactionForm form) {
+        double oldAmount = transaction.getAmount();
+        double newAmount = form.getAmount();
+        Integer oldMoneySourceId = transaction.getMoneySources().getId();
+        Integer newMoneySourceId = form.getMoneySourcesId();
+        boolean isMoneySourceChanged = !Objects.equals(oldMoneySourceId, newMoneySourceId);
+        boolean isAmountChanged = oldAmount != newAmount;
+
+        // Cập nhật danh mục
         if (!transaction.getCategories().getId().equals(form.getCategoriesId())) {
             transaction.setCategories(categoriesService.findById(form.getCategoriesId()));
         }
-        if (!transaction.getMoneySources().getId().equals(form.getMoneySourcesId())) {
-            transaction.setMoneySources(moneySourceService.findById(form.getMoneySourcesId()));
+
+        // Nếu nguồn tiền thay đổi
+        if (isMoneySourceChanged) {
+            // Hoàn lại tiền cũ cho nguồn cũ
+            moneySourceService.updateCurrentBalance(oldMoneySourceId, oldAmount);
+            // Trừ tiền mới khỏi nguồn mới
+            moneySourceService.updateCurrentBalance(newMoneySourceId, -newAmount);
+
+            // Cập nhật SpendingLimits tương ứng
+            updateSpendingLimitsOnUpdate(buildFormWith(form, oldMoneySourceId), -oldAmount);
+            updateSpendingLimitsOnUpdate(form, newAmount);
+
+            // Cập nhật lại source mới
+            transaction.setMoneySources(moneySourceService.findById(newMoneySourceId));
+        } else if (isAmountChanged) {
+            // Nếu chỉ đổi số tiền
+            double diff = newAmount - oldAmount;
+            moneySourceService.updateCurrentBalance(newMoneySourceId, -diff);
+            updateSpendingLimitsOnUpdate(form, diff);
         }
+
         transaction.setDescription(form.getDescription());
         if (!transaction.getTransactionDate().equals(form.getTransactionDate())) {
             transaction.setTransactionDate(form.getTransactionDate());
         }
         transaction.setUpdateAt(new Date());
-        updateTransactionAmount(transaction, form);
+
+        if (isAmountChanged) {
+            transaction.setAmount(newAmount);
+        }
+    }
+
+    private UpdateTransactionForm buildFormWith(UpdateTransactionForm form, Integer moneySourceId) {
+        UpdateTransactionForm clone = new UpdateTransactionForm();
+        clone.setAmount(form.getAmount());
+        clone.setCategoriesId(form.getCategoriesId());
+        clone.setUserId(form.getUserId());
+        clone.setMoneySourcesId(moneySourceId);
+        return clone;
     }
 
     private void updateTransactionAmount(Transactions transaction, UpdateTransactionForm form) {
         double oldAmount = transaction.getAmount();
-        if (form.getAmount() != oldAmount) {
-            transaction.setAmount(form.getAmount());
-            double amountUpdate = oldAmount - form.getAmount();
-            moneySourceService.updateCurrentBalance(form.getMoneySourcesId(), amountUpdate);
-            updateSpendingLimitsOnUpdate(form, amountUpdate);
-        }
+//        if (form.getAmount() != oldAmount) {
+        double amountUpdate = form.getAmount() - oldAmount;
+        transaction.setAmount(form.getAmount());
+        moneySourceService.updateCurrentBalance(form.getMoneySourcesId(), -amountUpdate);
+        updateSpendingLimitsOnUpdate(form, amountUpdate);
+//        }
     }
 
     private void updateSpendingLimitsOnUpdate(UpdateTransactionForm form, double amountUpdate) {
@@ -199,7 +236,7 @@ public class TransactionService implements ITransactionService {
             if (transactionOpt.isPresent()) {
                 Transactions transaction = transactionOpt.get();
                 moneySourceService.updateCurrentBalance(transaction.getMoneySources().getId(), transaction.getAmount());
-                updateSpendingLimitsOnDelete(transaction);
+                updateSpendingLimitsOnDelete(transaction, transaction.getAmount());
                 transactionRepository.deleteById(id);
                 count++;
             }
@@ -207,16 +244,35 @@ public class TransactionService implements ITransactionService {
         return count > 0;
     }
 
-    private void updateSpendingLimitsOnDelete(Transactions transaction) {
+    private void updateSpendingLimitsOnDelete(Transactions transaction, double amountUpdate) {
+        Categories category = categoriesService.findById(transaction.getCategories().getId());
+        if (categoriesService.isParentCategories(transaction.getCategories().getId())) {
+            updateSpendingLimitsForParentCategoryOnDelete(transaction, category, amountUpdate);
+        } else {
+            updateSpendingLimitForChildCategoryOnDelete(transaction, category, amountUpdate);
+        }
+
+    }
+
+    private void updateSpendingLimitsForParentCategoryOnDelete(Transactions transaction, Categories category, double amountUpdate) {
         SpendingLimits spendingLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
-                transaction.getCategories().getId(), transaction.getMoneySources().getId(), transaction.getUser().getId());
+                category.getId(), transaction.getMoneySources().getId(), transaction.getUser().getId());
         if (spendingLimits != null && spendingLimits.isActive()) {
-            spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() - transaction.getAmount());
+            spendingLimitsService.updateActualSpent(spendingLimits.getId(), spendingLimits.getActualSpent() - amountUpdate);
         }
     }
 
-    private void updateSpendingLimitsForParentCategoryOnUpdate(Transactions transactions) {
-
+    private void updateSpendingLimitForChildCategoryOnDelete(Transactions transaction, Categories category, double amountUpdate) {
+        SpendingLimits parentLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
+                category.getParentId(), transaction.getMoneySources().getId(), transaction.getUser().getId());
+        if (parentLimits != null && parentLimits.isActive()) {
+            spendingLimitsService.updateActualSpent(parentLimits.getId(), parentLimits.getActualSpent() - amountUpdate);
+        }
+        SpendingLimits childLimits = spendingLimitsService.findByCategoriesIdAndMoneySourcesIdAndUserId(
+                category.getId(), transaction.getMoneySources().getId(), transaction.getUser().getId());
+        if (childLimits != null && childLimits.isActive()) {
+            childLimits.setActualSpent(childLimits.getActualSpent() - amountUpdate);
+        }
     }
 
     @Override
@@ -275,4 +331,38 @@ public class TransactionService implements ITransactionService {
         return modelMapper.map(transactions, new TypeToken<List<TransactionsDTO>>() {
         }.getType());
     }
+
+    @Transactional
+    @Override
+    public Map<Integer, ReportModel> getReport(Integer userId) {
+        LocalDate now = LocalDate.now();
+        List<Transactions> transactions = transactionRepository.getReportToday(
+                userId, now.getDayOfMonth(), now.getMonthValue(), now.getYear()
+        );
+        Map<Integer, ReportModel> result = new HashMap<>();
+
+        List<TransactionsDTO> transactionsDTOS = modelMapper.map(transactions, new TypeToken<List<TransactionsDTO>>() {
+        }.getType());
+        for (TransactionsDTO t : transactionsDTOS) {
+            if (result.containsKey(t.getCategoriesId())) {
+                ReportModel r = result.get(t.getCategoriesId());
+                r.setAmount(r.getAmount() + t.getAmount());
+            } else {
+                ReportModel reportModel = new ReportModel();
+                reportModel.setName(t.getCategoriesName());
+                reportModel.setAmount(t.getAmount());
+                reportModel.setType(t.getTransactionTypeType());
+                result.put(t.getCategoriesId(), reportModel);
+
+            }
+        }
+        return result.entrySet().stream()
+                .filter(entry -> entry.getValue().getAmount() > 0)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
+    }
+
+
 }

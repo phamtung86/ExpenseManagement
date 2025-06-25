@@ -5,10 +5,12 @@ import com.vti.dto.filter.TransactionFilter;
 import com.vti.entity.Transactions;
 import com.vti.form.CreateTransactionForm;
 import com.vti.form.UpdateTransactionForm;
+import com.vti.models.ReportModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ITransactionService {
     Page<TransactionsDTO> filterTransactions(TransactionFilter filter, Integer userId, Pageable pageable);
@@ -30,4 +32,6 @@ public interface ITransactionService {
     double getAllTotalIncomesByTime(String type, Integer userID);
 
     List<TransactionsDTO> getRecentTransactions(Integer userID, int limit);
+
+    Map<Integer, ReportModel> getReport(Integer userId);
 }

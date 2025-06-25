@@ -7,6 +7,7 @@ import com.vti.dto.filter.TransactionFilter;
 import com.vti.entity.Transactions;
 import com.vti.form.CreateTransactionForm;
 import com.vti.form.UpdateTransactionForm;
+import com.vti.models.ReportModel;
 import com.vti.service.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
@@ -79,5 +81,11 @@ public class TransactionController {
     @GetMapping("/recent-transactions/user/{userId}/limit/{limit}")
     public ResponseEntity<List<TransactionsDTO>> getRecentTransactions(@PathVariable(name = "userId") Integer userId, @PathVariable(name = "limit") int limit) {
         return ResponseEntity.status(200).body(transactionService.getRecentTransactions(userId, limit));
+    }
+
+    @GetMapping("/report/user/{id}")
+    public ResponseEntity<Map<Integer, ReportModel>> getReport(@PathVariable(name = "id") Integer id){
+        return ResponseEntity.status(200)
+                .body(transactionService.getReport(id));
     }
 }

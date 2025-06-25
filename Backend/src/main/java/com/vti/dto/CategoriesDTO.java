@@ -23,6 +23,8 @@ public class CategoriesDTO {
 
     private String transactionTypesName;
 
+    private String transactionTypeType;
+
     private List<TransactionsDTO> transactions;
 
     private List<SpendingLimitsDTO> spendingLimits;

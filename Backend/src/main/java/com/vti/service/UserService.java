@@ -143,6 +143,11 @@ public class UserService implements IUserService {
     public boolean existsByPhoneNumberAndIdNot(String phoneNumber, Integer id) {
         return userRepository.existsByPhoneNumberAndIdNot(phoneNumber, id);
     }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 //
 //    public UserResponseDTO getUserById(Integer id) {
 //        Optional<User> user = userRepository.findById(id);
