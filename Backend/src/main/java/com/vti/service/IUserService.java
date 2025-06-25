@@ -10,6 +10,8 @@ import com.vti.form.CreateUserForm;
 import com.vti.form.ChangePasswordForm;
 import com.vti.form.UpdateUserForm;
 
+import java.util.List;
+
 public interface IUserService {
 
     User createUser(CreateUserForm createUserForm);
@@ -38,10 +40,7 @@ public interface IUserService {
     Integer getCurrentUserId();
 
     boolean existsByPhoneNumberAndIdNot(String phoneNumber, Integer id);
-//
-//    UserResponseDTO getUserById(Integer id);
-//
-//    UserResponseDTO updateUser(Integer id, UserRequestDTO userRequestDTO);
-////    User updateUser(User user);
+
+    List<User> getAllUsers();
 
 }

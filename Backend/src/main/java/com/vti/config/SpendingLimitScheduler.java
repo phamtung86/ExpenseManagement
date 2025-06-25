@@ -16,7 +16,6 @@ public class SpendingLimitScheduler {
     @Autowired
     private ISpendingLimitsRepository spendingLimitsRepository;
 
-    // Chạy mỗi ngày lúc 0h
     @Scheduled(cron = "0 0 0 * * *")
     public void checkAndResetSpendingLimits() {
         List<SpendingLimits> expiredLimits = spendingLimitsRepository.findByEndDate(LocalDate.now());

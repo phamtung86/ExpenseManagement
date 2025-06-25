@@ -39,9 +39,6 @@ public class TokenManager {
     // Validate JWT Token
     public Boolean validateJwtToken(String token, UserDetails userDetails) {
         final String username = getPhoneNumberFromToken(token);
-        System.out.println("Phone in token: " + username);
-        System.out.println("UserDetails username: " + userDetails.getUsername());
-
         final Claims claims = Jwts
                 .parserBuilder()
                 .setSigningKey(key())
