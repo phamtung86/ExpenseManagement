@@ -6,9 +6,6 @@ import com.vti.entity.Categories;
 import com.vti.form.CreateCategories;
 import com.vti.form.UpdateCategories;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-
 
 import java.util.List;
 
@@ -19,5 +16,7 @@ public interface ICategoriesService {
     boolean deleteCategories(Integer id);
     Categories findById(int id);
 
-   List<CategoriesDTO> getAllCategories();
+   List<CategoriesDTO> getAllCategories(int userID);
+    boolean isParentCategories(Integer id);
+    List<CategoriesDTO> getAllCategoriesWithParentChild(Integer userID);
 }

@@ -29,6 +29,7 @@ public class CategoriesDTO {
 
     private List<CategoriesDTO> children;
 
+
     public CategoriesDTO(Integer id, String name, Integer parentId, String icon,
                          String transactionTypesId, String transactionTypesName,
                          List<CategoriesDTO> children) {

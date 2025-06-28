@@ -30,14 +30,34 @@ public class CategoriesController {
 @Autowired
 private ICategoriesService categoriesService;
 
-public CategoriesController(ICategoriesService categoriesService) {
-    this.categoriesService = categoriesService;
+//public CategoriesController(ICategoriesService categoriesService) {
+//    this.categoriesService = categoriesService;
+//}
+
+    /**
+     * FLOW:
+     * [1] Nhận userID từ path param.
+     * [2] Gọi Service lấy tất cả Categories của user.
+     * [3] Service gọi Repository query DB.
+     * [4] Trả List<CategoriesDTO>.
+     */
+@GetMapping("user/{id}")
+public ResponseEntity<List<CategoriesDTO>> getAllCategories(@PathVariable(name = "id") int userID) {
+    return new ResponseEntity<>(categoriesService.getAllCategories(userID), HttpStatus.OK);
 }
 
-@GetMapping
-public List<CategoriesDTO> getAllCategories() {
-    return categoriesService.getAllCategories();
-}
+    /**
+     * FLOW:
+     * [1] Nhận userID từ path param.
+     * [2] Gọi Service lấy tất cả Categories của user.
+     * [3] Service lọc root (parentId == null).
+     * [4] Duyệt đệ quy gán children.
+     * [5] Trả List<CategoriesDTO> dạng cây.
+     */
+    @GetMapping("/parent-child/user/{id}")
+    public List<CategoriesDTO> getAllCategoriesWithParentChild(@PathVariable(name = "id") int userID) {
+        return categoriesService.getAllCategoriesWithParentChild(userID);
+    }
     @PostMapping
     public ResponseEntity<?> createCategories(@RequestBody CreateCategories categories) {
         categoriesService.createCategories(categories);
