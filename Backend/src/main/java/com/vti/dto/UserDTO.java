@@ -24,4 +24,6 @@ public class UserDTO {
 
     private Date updateAt;
 
+    private boolean isNotice;
+
 }

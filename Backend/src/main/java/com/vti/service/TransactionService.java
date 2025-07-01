@@ -58,7 +58,7 @@ public class TransactionService implements ITransactionService {
                 entity.getTransactionDate(),
                 entity.getUpdateAt(),
                 entity.getDescription(),
-                new UserDTO(null, entity.getUser().getFullName(), null, null, null, null),
+                new UserDTO(null, entity.getUser().getFullName(), null, null, null, null, entity.getUser().isNotice()),
                 entity.getCategories().getId(),
                 entity.getCategories().getName(),
                 entity.getTransactionTypes().getId().toString(),
