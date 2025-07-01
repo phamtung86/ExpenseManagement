@@ -42,6 +42,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update user failed");
     }
 
+    @PutMapping("/update-notice/{id}")
+    public ResponseEntity<?> updateNotice(@PathVariable(name = "id") Integer userId, @RequestParam(name = "notice") boolean notice){
+        userService.updateNotice(userId, notice);
+        return ResponseEntity.ok("Update notice success");
+    }
+
+
 //
 //    @GetMapping("/get-user-info/{id}")
 //    public  ResponseEntity<UserResponseDTO> getUserById(@PathVariable Integer id){

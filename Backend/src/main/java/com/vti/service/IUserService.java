@@ -43,4 +43,6 @@ public interface IUserService {
 
     List<User> getAllUsers();
 
+    void updateNotice(Integer userId, boolean notice);
+
 }

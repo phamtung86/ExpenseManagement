@@ -40,6 +40,7 @@ public class UserService implements IUserService {
     public User createUser(CreateUserForm createUserForm) {
         User user = modelMapper.map(createUserForm, User.class);
         user.setPassword(passwordEncoder.encode(createUserForm.getPassword()));
+        user.setNotice(false);
         user.setCreatedAt(new Date());
         return userRepository.save(user);
     }
@@ -147,6 +148,16 @@ public class UserService implements IUserService {
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public void updateNotice(Integer userId, boolean notice) {
+        User u = userRepository.findById(userId).orElse(null);
+        if (u != null){
+            u.setNotice(notice);
+            userRepository.save(u);
+        }
+
     }
 //
 //    public UserResponseDTO getUserById(Integer id) {

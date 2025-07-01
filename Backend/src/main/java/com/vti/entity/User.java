@@ -34,6 +34,9 @@ public class User {
     @Column(name = "update_at")
     private Date updateAt;
 
+    @Column(name = "is_notice")
+    private boolean isNotice;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<Transactions> transactions;
 
