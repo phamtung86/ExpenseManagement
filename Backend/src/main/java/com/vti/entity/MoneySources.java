@@ -39,7 +39,7 @@ public class MoneySources {
     @Column(name = "update_at")
     private Date updateAt;
 
-    @OneToMany(mappedBy = "moneySources", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "moneySources", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transactions> transactions;
 
     @OneToMany(mappedBy = "moneySources", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -64,6 +65,10 @@ public interface ITransactionRepository extends JpaRepository<Transactions, Inte
                                       @Param("day") int day,
                                       @Param("month") int month,
                                       @Param("year") int year);
+
+    @Modifying
+    @Query("DELETE FROM transactions t WHERE t.id = :id")
+    int hardDelete(Integer id);
 
 }
 
