@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -230,15 +231,44 @@ public class TransactionService implements ITransactionService {
     @Transactional
     @Override
     public boolean deleteTransaction(List<Integer> transactionIDs) {
+        if (transactionIDs == null || transactionIDs.isEmpty()) {
+            return false;
+        }
         int count = 0;
         for (Integer id : transactionIDs) {
-            Optional<Transactions> transactionOpt = transactionRepository.findById(id);
-            if (transactionOpt.isPresent()) {
-                Transactions transaction = transactionOpt.get();
-                moneySourceService.updateCurrentBalance(transaction.getMoneySources().getId(), transaction.getAmount());
-                updateSpendingLimitsOnDelete(transaction, transaction.getAmount());
-                transactionRepository.deleteById(id);
-                count++;
+            if (id == null) {
+                continue;
+            }
+            try {
+                boolean exists = transactionRepository.existsById(id);
+                if (!exists) {
+                    continue;
+                }
+                Optional<Transactions> transactionOpt = transactionRepository.findById(id);
+                if (transactionOpt.isPresent()) {
+                    Transactions transaction = transactionOpt.get();
+                    Integer moneySourceId = transaction.getMoneySources().getId();
+                    Double amount = transaction.getAmount();
+                    moneySourceService.updateCurrentBalance(moneySourceId, amount);
+                    updateSpendingLimitsOnDelete(transaction, amount);
+                    transactionRepository.hardDelete(id);
+                    transactionRepository.flush();
+                    boolean stillExists = transactionRepository.existsById(id);
+                    if (!stillExists) {
+                        count++;
+                    } else {
+                        System.out.println("Xóa thất bại Transaction ID: " + id + " - vẫn tồn tại trong DB");
+                    }
+                } else {
+                    System.out.println("Không tìm thấy Transaction ID: " + id);
+                }
+            } catch (StackOverflowError e) {
+                System.out.println(" StackOverflowError khi xử lý Transaction ID: " + id);
+                System.out.println("Có thể do circular reference trong entity relationships");
+                e.printStackTrace();
+            } catch (Exception e) {
+                System.out.println("Lỗi khi xóa Transaction ID: " + id + " - " + e.getMessage());
+                e.printStackTrace();
             }
         }
         return count > 0;

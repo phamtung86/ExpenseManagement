@@ -37,7 +37,7 @@ public class User {
     @Column(name = "is_notice")
     private boolean isNotice;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Transactions> transactions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
