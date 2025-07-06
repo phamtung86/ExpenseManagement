@@ -108,7 +108,6 @@ public class ReportExpenseEveryDayScheduler {
         helper.setTo(toEmail);
         helper.setSubject(subject);
         helper.setText(htmlContent, true); // true để gửi HTML
-
         javaMailSender.send(message);
     }
 

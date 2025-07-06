@@ -16,10 +16,10 @@ import java.util.List;
 @Repository
 public interface ITransactionRepository extends JpaRepository<Transactions, Integer>,
         JpaSpecificationExecutor<Transactions> {
-    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId ORDER BY t.id DESC")
+    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId ORDER BY t.transactionDate DESC")
     List<Transactions> findAllByUserId(@Param("userId") Integer userId);
 
-    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId ORDER BY t.id DESC")
+    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId ORDER BY t.transactionDate DESC")
     Page<Transactions> findAllByUserId(Pageable pageable, Integer userId);
 
 
@@ -57,10 +57,10 @@ public interface ITransactionRepository extends JpaRepository<Transactions, Inte
                                 @Param("userId") int userId);
 
 
-    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId ORDER BY t.id DESC LIMIT :limit")
+    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId ORDER BY t.transactionDate DESC LIMIT :limit")
     List<Transactions> findRecentTransactionsByUserId(@Param("userId") Integer userId, @Param("limit") int limit);
 
-    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId AND FUNCTION('day', t.transactionDate) = :day AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year ORDER BY t.id DESC")
+    @Query("SELECT t FROM transactions t WHERE t.user.id = :userId AND FUNCTION('day', t.transactionDate) = :day AND FUNCTION('month', t.transactionDate) = :month AND FUNCTION('year', t.transactionDate) = :year ORDER BY t.transactionDate DESC")
     List<Transactions> getReportToday(@Param("userId") Integer userId,
                                       @Param("day") int day,
                                       @Param("month") int month,

@@ -1,0 +1,505 @@
+.spending-limits-page {
+  padding: 20px 0;
+}
+
+.spending-limits-page>.page-header>button {
+    width: 12rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.8rem;
+  color: var(--dark-color);
+}
+
+.limit-form-container {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.limit-form h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+  color: var(--dark-color);
+}
+
+.checkbox-group {
+  margin-top: 10px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  margin-right: 10px;
+}
+
+.no-limits {
+  text-align: center;
+  padding: 50px 20px;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  color: #777;
+}
+
+.limits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.limit-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+}
+
+.limit-card.inactive {
+  opacity: 0.5; /* Giảm từ 0.7 xuống 0.5 để rõ hơn */
+  filter: grayscale(30%); /* Thêm hiệu ứng xám nhạt */
+}
+
+.limit-card.inactive .limit-header {
+  background-color: #f8f9fa; /* Màu nền nhạt hơn */
+}
+
+.limit-card.inactive .progress-fill {
+  opacity: 0.6; /* Thanh progress cũng nhạt đi */
+}
+
+.limit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #f5f7fa;
+  border-bottom: 1px solid #eee;
+}
+
+.limit-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.limit-title h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.limit-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.limit-badge.daily {
+  background-color: rgba(52, 152, 219, 0.1);
+  color: var(--primary-color);
+}
+
+.limit-badge.weekly {
+  background-color: rgba(155, 89, 182, 0.1);
+  color: #9b59b6;
+}
+
+.limit-badge.monthly {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: var(--secondary-color);
+}
+
+.limit-badge.yearly {
+  background-color: rgba(230, 126, 34, 0.1);
+  color: #e67e22;
+}
+
+.limit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-icon.toggle {
+  font-size: 1.2rem;
+}
+
+.btn-icon.toggle.active {
+  color: var(--secondary-color);
+}
+
+.btn-icon.toggle.inactive {
+  color: #95a5a6;
+}
+
+.limit-details {
+  padding: 20px;
+}
+
+.limit-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.limit-amount,
+.limit-spent,
+.limit-remaining {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.8rem;
+  color: #777;
+  margin-bottom: 5px;
+}
+
+.value {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.limit-progress {
+  margin-bottom: 15px;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: #eee;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.progress-fill.normal {
+  background-color: var(--primary-color);
+}
+
+.progress-fill.warning {
+  background-color: var(--warning-color);
+}
+
+.progress-fill.danger {
+  background-color: var(--danger-color);
+}
+
+.percentage {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.limit-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.limit-source,
+.limit-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.limit-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.limit-note i {
+  margin-top: 3px;
+}
+
+@media (max-width: 768px) {
+  .limits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .limit-info {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .limit-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Thêm vào SpendingLimitsPage.css */
+.progress-fill.over-limit {
+  background-color: #dc3545 !important;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255,255,255,.1) 10px,
+    rgba(255,255,255,.1) 20px
+  );
+}
+
+.percentage.warning {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.value.negative {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.limit-warning, .limit-over {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 1rem;
+}
+
+.limit-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.limit-over {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.btn-icon.reset {
+  background-color: #ffa726;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-icon.reset:hover {
+  background-color: #ff9800;
+  transform: scale(1.05);
+}
+
+.btn-icon.reset:active {
+  transform: scale(0.95);
+}
+
+/* Reset suggestion styles */
+.reset-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background-color: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #856404;
+}
+
+.reset-suggestion i {
+  color: #ffc107;
+}
+
+/* Over limit message enhancement */
+.limit-over {
+  background-color: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-top: 8px;
+}
+
+.limit-over i {
+  color: #dc3545;
+  margin-right: 8px;
+}
+
+/* Warning button class for confirm modal */
+.btn-warning {
+  background-color: #ffc107;
+  color: #212529;
+  border: 1px solid #ffc107;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+  border-color: #d39e00;
+}
+
+/* Animation for reset button */
+@keyframes resetPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 167, 38, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 167, 38, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 167, 38, 0);
+  }
+}
+
+.btn-icon.reset {
+  animation: resetPulse 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .limit-actions {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .btn-icon.reset {
+    animation: none; /* Disable animation on mobile for performance */
+  }
+}
+
+/* Header actions */
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Section titles */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title i {
+  color: var(--primary-color);
+}
+
+/* Button styles */
+.btn-outline {
+  display: flex;
+  gap: 6px;
+  background-color: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Reset button enhancement */
+.btn-icon.reset {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-icon.reset:hover {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+.spending-limits-page>.page-header>.header-actions>.btn {
+  width: 10rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .header-actions .btn {
+    width: 100%;
+  }
+}
+
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enhanced danger button */
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+/* Progress indicator for deletion */
+.deletion-progress {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.deletion-progress i {
+  animation: spin 1s linear infinite;
+}
+
